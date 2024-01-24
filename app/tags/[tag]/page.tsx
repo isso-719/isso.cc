@@ -48,10 +48,10 @@ const Page = ({params}: { params: { tag: string } }) => {
                 </div>
                 <div className="flex sm:space-x-24">
                     <div className="hidden h-full max-h-screen min-w-[280px] max-w-[280px] flex-wrap overflow-auto rounded bg-gray-50 pt-5 shadow-md dark:bg-gray-900/70 dark:shadow-gray-800/40 sm:flex">
-                        <MenuTags jsonPath={`./data/tags.json`} tagName={params.tag} />
+                        <MenuTags jsonPath={`public/static/data/tags.json`} tagName={params.tag} />
                     </div>
                     <div>
-                        <Articles jsonPath={`./data/articles.json`} tagName={params.tag} />
+                        <Articles jsonPath={`public/static/data/articles.json`} tagName={params.tag} />
                     </div>
                 </div>
             </div>

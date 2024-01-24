@@ -26,7 +26,7 @@ const Page = (params: any) => {
     }
 
     // {"uncategorized":{"ids":["hello_world"],"count":1}}
-    const tags = JSON.parse(fs.readFileSync("./data/tags.json", "utf8"));
+    const tags = JSON.parse(fs.readFileSync("public/static/data/tags.json", "utf8"));
 
     return (
         <div className="mx-auto max-w-3xl px-4 sm:px-6 xl:max-w-5xl xl:px-0">

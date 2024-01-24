@@ -2,7 +2,7 @@ import * as fs from "fs";
 import React from "react";
 
 const LatestArticles = () => {
-    const articles = JSON.parse(fs.readFileSync("./data/latest_articles.json", "utf8"));
+    const articles = JSON.parse(fs.readFileSync("public/static/data/latest_articles.json", "utf8"));
     return (
         <>
             {articles.map((article: { id: number; date: string; title: string; tags: string[]; summary: string }) => {
