@@ -12,7 +12,7 @@ const Page = ({params}: { params: { id: string } }) => {
     let article;
     // mdxファイルを読み込む
     try {
-        article = fs.readFileSync(`./articles/${params.id}/${params.id}.mdx`, "utf-8");
+        article = fs.readFileSync(`static/articles/${params.id}/${params.id}.mdx`, "utf-8");
     } catch (e) {
         return (
             <NotFound/>
