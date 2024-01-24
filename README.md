@@ -20,7 +20,4 @@ make all
 
 # Start development server
 npm run dev
-
-# Build static site
-npm run build
 ```
