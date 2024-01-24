@@ -25,7 +25,7 @@ const LatestArticles = () => {
                                                     {article.title}
                                                 </a>
                                             </h2>
-                                            <div className="flex flex-wrap text-pink-500 hover:text-pink-600 dark:hover:text-pink-400">
+                                            <div className="my-1.5 flex flex-wrap text-pink-500 hover:text-pink-600 dark:hover:text-pink-400">
                                                 {article.tags.map((tag) => {
                                                     return (
                                                         <a className="mr-3 text-sm font-medium uppercase text-primary-500 hover:text-primary-600 dark:hover:text-primary-400"

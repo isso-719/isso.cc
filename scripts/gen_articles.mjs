@@ -14,6 +14,21 @@ let articles = allArticles.map((article) => {
   };
 });
 
+// tag とそれに紐づく記事のIDを取得する
+const tagMap = {};
+articles.forEach((article) => {
+  article.tags.forEach((tag) => {
+    if (!tagMap[tag]) {
+      tagMap[tag] = {
+        ids: [],
+        count: 0,
+      };
+    }
+    tagMap[tag].ids.push(article.id);
+    tagMap[tag].count += 1;
+  });
+});
+
 // date が新しい順にソートする, 同じ日付はファイル作成時間が新しい順にソートする
 articles.sort((a, b) => {
   if (a.date === b.date) {
@@ -33,3 +48,7 @@ const latestArticles = articles.slice(0, 5);
 fs.writeFileSync("data/latest_articles.json", JSON.stringify(latestArticles));
 
 console.log("Generated data/latest_articles.json");
+
+fs.writeFileSync("data/tags.json", JSON.stringify(tagMap));
+
+console.log("Generated data/tags.json");

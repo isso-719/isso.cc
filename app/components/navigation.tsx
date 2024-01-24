@@ -80,7 +80,7 @@ const Navigation = () => {
                         </div>
                         <div className="px-12 py-4">
                             <a className="text-2xl font-bold tracking-widest text-gray-900 dark:text-gray-100"
-                               href="/tags">
+                               href="/app/components/TagsMenu">
                                 TAGS
                             </a>
                         </div>

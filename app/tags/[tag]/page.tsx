@@ -1,12 +1,14 @@
 import Articles from "@/app/components/articles";
 import {Metadata} from "next";
 import MenuTags from "@/app/components/menu_tags";
+import * as fs from "fs";
+import NotFound from "next/dist/client/components/not-found-error";
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://isso.cc'),
 }
 
-const Page = (params: any) => {
+const Page = ({params}: { params: { tag: string } }) => {
     metadata.title = "BLOGS | ISSO BLOG";
     metadata.description = "いっそが思ったことを書くブログです。";
     metadata.openGraph = {
@@ -26,6 +28,15 @@ const Page = (params: any) => {
         images: '/opengraph-image.jpeg',
     }
 
+    try {
+        const tags = JSON.parse(fs.readFileSync("./data/tags.json", "utf8"));
+        if (!Object.keys(tags).includes(params.tag)) {
+            throw new Error("tag not found");
+        }
+    } catch (e) {
+        return <NotFound/>
+    }
+
     return (
         <div className="mx-auto max-w-3xl px-4 sm:px-6 xl:max-w-5xl xl:px-0">
             <div>
@@ -37,10 +48,10 @@ const Page = (params: any) => {
                 </div>
                 <div className="flex sm:space-x-24">
                     <div className="hidden h-full max-h-screen min-w-[280px] max-w-[280px] flex-wrap overflow-auto rounded bg-gray-50 pt-5 shadow-md dark:bg-gray-900/70 dark:shadow-gray-800/40 sm:flex">
-                        <MenuTags jsonPath={`./data/tags.json`}/>
+                        <MenuTags jsonPath={`./data/tags.json`} tagName={params.tag} />
                     </div>
                     <div>
-                        <Articles jsonPath={`./data/articles.json`} />
+                        <Articles jsonPath={`./data/articles.json`} tagName={params.tag} />
                     </div>
                 </div>
             </div>
