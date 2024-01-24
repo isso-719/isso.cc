@@ -27,7 +27,6 @@ const Navigation = () => {
                         </button>
                         {/*  TODO: toggle dark button  */}
                         <SwitchThemeBtn/>
-                        {/*  ハンバーガーボタン  */}
                         <div className="sm:hidden">
                             <button type="button"
                                     className="text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 focus:outline-none focus:text-gray-600 dark:focus:text-gray-400"
@@ -80,7 +79,7 @@ const Navigation = () => {
                         </div>
                         <div className="px-12 py-4">
                             <a className="text-2xl font-bold tracking-widest text-gray-900 dark:text-gray-100"
-                               href="/app/components/TagsMenu">
+                               href="/tags">
                                 TAGS
                             </a>
                         </div>

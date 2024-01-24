@@ -12,7 +12,7 @@ const NotFound = () => {
             <div className="flex flex-col items-center justify-center">
                 <div className="flex flex-col items-center justify-center">
                     <h1 className="text-6xl font-bold">404</h1>
-                    <h2 className="text-2xl font-bold">This page could not be found.</h2>
+                    <h2 className="text-2xl font-bold text-center">This page could not be found.</h2>
                 </div>
             </div>
         </div>
