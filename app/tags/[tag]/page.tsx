@@ -29,7 +29,7 @@ const Page = ({params}: { params: { tag: string } }) => {
     }
 
     try {
-        const tags = JSON.parse(fs.readFileSync("./data/tags.json", "utf8"));
+        const tags = JSON.parse(fs.readFileSync("public/static/data/tags.json", "utf-8"));
         if (!Object.keys(tags).includes(params.tag)) {
             throw new Error("tag not found");
         }

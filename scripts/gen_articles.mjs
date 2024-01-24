@@ -39,16 +39,16 @@ articles.sort((a, b) => {
   return new Date(b.date).getTime() - new Date(a.date).getTime();
 });
 
-fs.writeFileSync("data/articles.json", JSON.stringify(articles));
+fs.writeFileSync("public/static/data/articles.json", JSON.stringify(articles));
 
-console.log("Generated data/articles.json");
+console.log("Generated public/static/data/articles.json");
 
 const latestArticles = articles.slice(0, 5);
 
-fs.writeFileSync("data/latest_articles.json", JSON.stringify(latestArticles));
+fs.writeFileSync("public/static/data/latest_articles.json", JSON.stringify(latestArticles));
 
-console.log("Generated data/latest_articles.json");
+console.log("Generated public/static/data/latest_articles.json");
 
-fs.writeFileSync("data/tags.json", JSON.stringify(tagMap));
+fs.writeFileSync("public/static/data/tags.json", JSON.stringify(tagMap));
 
-console.log("Generated data/tags.json");
+console.log("Generated public/static/data/tags.json");

@@ -4,12 +4,13 @@ gen-articles:
 
 .PHONY: gen-folders
 gen-folders:
-	mkdir -p ./data && mkdir -p ./articles
+	mkdir -p public/static/data && mkdir -p public/static/articles
 
 .PHONY: clean-blog
 clean-blog:
-	@test -f ./data/articles.json && rm ./data/articles.json || true
-	@test -f ./data/latest_articles.json && rm ./data/latest_articles.json || true
+	@test -f public/static/data/articles.json && rm public/static/data/articles.json || true
+	@test -f public/static/data/tags.json && rm public/static/data/tags.json || true
+	@test -f public/static/data/latest_articles.json && rm public/static/data/latest_articles.json || true
 
 .PHONY: gen
 gen: gen-folders clean-blog gen-articles
