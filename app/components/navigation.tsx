@@ -15,16 +15,16 @@ const Navigation = () => {
                 <div className="absolute right-5">
                     <div className="flex space-x-4">
                         <Link href="/blog" className="hidden sm:block">BLOGS</Link>
-                        {/*<Link href="/tags" className="hidden sm:block">TAGS</Link>*/}
-                        {/*<Link href="/about" className="hidden sm:block">ABOUT</Link>*/}
+                        <Link href="/tags" className="hidden sm:block">TAGS</Link>
+                        <Link href="/about" className="hidden sm:block">ABOUT</Link>
                         {/* TODO: algolia search */}
-                        {/*<button>*/}
-                        {/*    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"*/}
-                        {/*         stroke="currentColor" className="h-6 w-6 text-gray-900 dark:text-gray-100">*/}
-                        {/*        <path strokeLinecap="round" strokeLinejoin="round"*/}
-                        {/*              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>*/}
-                        {/*    </svg>*/}
-                        {/*</button>*/}
+                        <button>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
+                                 stroke="currentColor" className="h-6 w-6 text-gray-900 dark:text-gray-100">
+                                <path strokeLinecap="round" strokeLinejoin="round"
+                                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
+                            </svg>
+                        </button>
                         {/*  TODO: toggle dark button  */}
                         <SwitchThemeBtn/>
                         {/*  ハンバーガーボタン  */}

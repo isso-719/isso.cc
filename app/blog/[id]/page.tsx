@@ -4,7 +4,9 @@ import NotFound from "next/dist/client/components/not-found-error";
 import * as fs from "fs";
 import {Metadata} from "next";
 
-export const metadata: Metadata = {}
+export const metadata: Metadata = {
+    metadataBase: new URL('https://isso.cc'),
+}
 
 const Page = ({params}: { params: { id: string } }) => {
     let article;
@@ -25,8 +27,7 @@ const Page = ({params}: { params: { id: string } }) => {
     const summary = articleMeta[4].replace("summary: ", "");
     const author = articleMeta[5].replace("author: ", "");
     const content = article.split("\n").slice(7).join("\n");
-
-    metadata.metadataBase = new URL("https://isso.cc/");
+    
     metadata.title = `${title} | ISSO BLOG`;
     metadata.description = summary;
     metadata.openGraph = {
@@ -36,12 +37,14 @@ const Page = ({params}: { params: { id: string } }) => {
         siteName: "ISSO BLOG",
         locale: 'ja_JP',
         url: `https://isso.cc/blog/${params.id}`,
+        images: '/opengraph-image.jpeg',
     }
     metadata.twitter = {
         card: "summary_large_image",
         title: `${title} | ISSO BLOG`,
         description: summary,
         site: "@isso_app",
+        images: '/opengraph-image.jpeg',
     }
 
     return (

@@ -7,15 +7,15 @@ if [ -z "$name" ]; then
   exit 1
 fi
 
-if [ -d "./articles/$name" ]; then
+if [ -d "./public/static/articles/$name" ]; then
   echo "Article already exists, please choose another name"
   exit 1
 fi
 
-mkdir -p ./articles/$name
-touch ./articles/$name/$name.mdx
+mkdir -p ./public/static/articles/$name
+touch .public/static/articles/$name/$name.mdx
 
-cat << EOF > ./articles/${name}/${name}.mdx
+cat << EOF > ./public/static/articles/$name/$name.mdx
 ---
 title: Implement me!
 date: $(date +%Y-%m-%d)
@@ -28,8 +28,5 @@ author: Your Name
 
 EOF
 
-cd ./public/static/articles
-ln -s ../../../articles/${name} ${name}
-
-echo "Article created at ./articles/${name}/${name}.mdx"
+echo "Article created at ./public/static/articles/$name/$name.mdx"
 exit 0

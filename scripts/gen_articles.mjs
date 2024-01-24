@@ -4,7 +4,7 @@ import * as fs from "fs";
 let allArticles = fs.readdirSync("articles");
 let articles = allArticles.map((article) => {
   const id = article;
-  const lines = fs.readFileSync(`articles/${article}/${article}.mdx`, "utf-8").split("\n");
+  const lines = fs.readFileSync(`public/static/articles/${article}/${article}.mdx`, "utf-8").split("\n");
   const title = lines[1].replace("title: ", "");
   const date = lines[2].replace("date: ", "");
   const tags = lines[3].replace("tags: ", "").split(",").map((tag) => tag.trim());
@@ -17,8 +17,8 @@ let articles = allArticles.map((article) => {
 // date が新しい順にソートする, 同じ日付はファイル作成時間が新しい順にソートする
 articles.sort((a, b) => {
   if (a.date === b.date) {
-    const aStat = fs.statSync(`articles/${a.id}.mdx`);
-    const bStat = fs.statSync(`articles/${b.id}.mdx`);
+    const aStat = fs.statSync(`public/static/articles/${a.id}/${a.id}.mdx`);
+    const bStat = fs.statSync(`public/static/articles/${b.id}/${b.id}.mdx`);
     return bStat.mtimeMs - aStat.mtimeMs;
   }
   return new Date(b.date).getTime() - new Date(a.date).getTime();

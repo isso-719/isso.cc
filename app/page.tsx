@@ -1,10 +1,11 @@
 import LatestArticles from "@/app/components/latest_articles";
 import type { Metadata } from 'next'
 
-export const metadata: Metadata = {}
+export const metadata: Metadata = {
+    metadataBase: new URL('https://isso.cc'),
+}
 
 const Page = (props: any) => {
-    metadata.metadataBase = new URL("https://isso.cc/");
     metadata.title = "HOME | ISSO BLOG";
     metadata.description = "いっそが思ったことを書くブログです。";
     metadata.openGraph = {
@@ -14,12 +15,14 @@ const Page = (props: any) => {
         siteName: "ISSO BLOG",
         locale: 'ja_JP',
         url: `https://isso.cc/`,
+        images: '/opengraph-image.jpeg',
     }
     metadata.twitter = {
         card: "summary_large_image",
         title: "HOME | ISSO BLOG",
         description: "いっそが思ったことを書くブログです。",
         site: "@isso_app",
+        images: '/opengraph-image.jpeg',
     }
 
     return (
