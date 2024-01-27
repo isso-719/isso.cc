@@ -17,7 +17,7 @@ const Page = ({params}: { params: { tag: string } }) => {
         type: "website",
         siteName: "ISSO BLOG",
         locale: 'ja_JP',
-        url: `https://isso.cc/blog/`,
+        url: `https://isso.cc/tags/${params.tag}`,
         images: '/opengraph-image.jpeg',
     }
     metadata.twitter = {

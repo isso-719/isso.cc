@@ -7,7 +7,7 @@ import Navigation from "@/app/components/navigation";
 export const Providers: FC<PropsWithChildren> = ({ children }) => {
     return (
         <ThemeProvider attribute="class">
-            <div className="flex flex-col min-h-screen py-5 bg-white text-black antialiased dark:bg-gray-950 dark:text-white">
+            <div className="flex flex-col min-h-screen py-5 bg-white text-black antialiased dark:bg-gray-950 dark:text-white transition-colors duration-300">
                 <Navigation />
 
                 <main className="flex-1 container max-w-screen-xl mx-auto px-5 py-10">
