@@ -2,7 +2,7 @@ import Articles from "@/app/components/articles";
 import {Metadata} from "next";
 import MenuTags from "@/app/components/menu_tags";
 import * as fs from "fs";
-import NotFound from "next/dist/client/components/not-found-error";
+import NotFound from "@/app/not-found";
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://isso.cc'),

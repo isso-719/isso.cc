@@ -1,6 +1,6 @@
 // @ts-ignore
 import Article from "@/app/components/article";
-import NotFound from "next/dist/client/components/not-found-error";
+import NotFound from "@/app/not-found";
 import * as fs from "fs";
 import {Metadata} from "next";
 
