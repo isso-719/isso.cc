@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <div style="all: initial !important;"/>
+    <url>
+        <loc>https://isso.cc/</loc>
+    </url>
+    <url>
+        <loc>https://isso.cc/blog</loc>
+    </url>
+    <url>
+        <loc>https://isso.cc/tags</loc>
+    </url>
+    <url>
+        <loc>https://isso.cc/about</loc>
+    </url>
+    <url>
+        <loc>https://isso.cc/blog/hello_world</loc>
+    </url>
+    <url>
+        <loc>https://isso.cc/tags/uncategorized</loc>
+    </url>
+</sitemapindex>

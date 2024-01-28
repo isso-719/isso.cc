@@ -1,7 +1,7 @@
 import * as fs from "fs";
 
 // articles 内のフォルダを取得する
-let allArticles = fs.readdirSync("articles");
+let allArticles = fs.readdirSync("public/static/articles/");
 let articles = allArticles.map((article) => {
   const id = article;
   const lines = fs.readFileSync(`public/static/articles/${article}/${article}.mdx`, "utf-8").split("\n");

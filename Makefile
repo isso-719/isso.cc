@@ -6,6 +6,11 @@ gen-articles:
 gen-folders:
 	mkdir -p public/static/data && mkdir -p public/static/articles
 
+.PHONY: gen-sitemap
+gen-sitemap:
+	@test -f public/sitemap.xml && rm public/sitemap.xml || true
+	@node ./scripts/gen_sitemap.mjs
+
 .PHONY: clean-blog
 clean-blog:
 	@test -f public/static/data/articles.json && rm public/static/data/articles.json || true
@@ -13,7 +18,7 @@ clean-blog:
 	@test -f public/static/data/latest_articles.json && rm public/static/data/latest_articles.json || true
 
 .PHONY: gen
-gen: gen-folders clean-blog gen-articles
+gen: gen-folders clean-blog gen-articles gen-sitemap
 
 .PHONY: build
 build:
