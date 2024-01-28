@@ -63,10 +63,10 @@ const Page = ({params}: { params: { id: string } }) => {
                                     </div>
                                 </dl>
                                 <div>
-                                    <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl sm:leading-10 md:text-5xl md:leading-14">
+                                    <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl sm:leading-10 md:text-5xl md:leading-14 break-all">
                                         {title}
                                     </h1>
-                                    <h2 className="py-4 leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:leading-10 md:leading-14">
+                                    <h2 className="py-4 leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:leading-10 md:leading-14 break-all">
                                         {author}
                                     </h2>
                                 </div>
@@ -84,7 +84,7 @@ const Page = ({params}: { params: { id: string } }) => {
                                 <div className="flex flex-wrap">
                                     {tags.map((tag) => {
                                         return (
-                                            <a className="mr-3 text-sm font-medium uppercase text-pink-500 hover:text-pink-600 dark:hover:text-pink-400"
+                                            <a className="mr-3 text-sm font-medium uppercase text-pink-500 hover:text-pink-600 dark:hover:text-pink-400 break-words"
                                                href={`/tags/${tag}`}
                                                key={tag}>
                                                 {tag}

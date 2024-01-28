@@ -5,7 +5,8 @@ import SyntaxHighlighter from 'react-syntax-highlighter'
 export function Article(props) {
   const components = {
     a: ({href, children}) => (
-      <a className="text-pink-500 hover:text-pink-600 dark:hover:text-pink-400 font-bold" href={href} target="_blank" rel="noopener noreferrer">
+      <a className="text-pink-500 hover:text-pink-600 dark:hover:text-pink-400 font-bold break-all"
+         href={href} target="_blank" rel="noopener noreferrer">
         {children}
       </a>
     ),
@@ -20,7 +21,7 @@ export function Article(props) {
     },
     code: ({children}) => {
       return (
-        <code className="text-pink-500 hover:text-pink-600 dark:hover:text-pink-400 font-bold bg-gray-100 dark:bg-gray-800 rounded p-1">
+        <code className="text-pink-500 hover:text-pink-600 dark:hover:text-pink-400 font-bold bg-gray-100 dark:bg-gray-800 rounded p-1 break-all">
           {children}
         </code>
       )
