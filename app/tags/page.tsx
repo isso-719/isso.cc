@@ -47,7 +47,7 @@ const Page = (params: any) => {
                                         {tag}
                                     </a>
                                     <a className="-ml-2 text-sm font-semibold uppercase text-gray-600 dark:text-gray-300"
-                                       aria-label="View posts tagged next-js" href="/tags/next-js">
+                                       aria-label={`View posts tagged with ${tag}`} href={`/tags/${tag}`}>
                                         ({tags[tag].count})
                                     </a>
                                 </div>
