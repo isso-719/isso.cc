@@ -23,7 +23,7 @@ for (const tag of Object.keys(tags)) {
   pages.push(tagPrefix + tag);
 }
 
-let sitemap = `<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><div style="all: initial !important;"/>`;
+let sitemap = `<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
 
 for (const page of pages) {
   sitemap += `<url><loc>${domain}${page}</loc></url>`;
