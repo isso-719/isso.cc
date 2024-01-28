@@ -32,3 +32,4 @@ for (const page of pages) {
 sitemap += `</sitemapindex>`;
 
 fs.writeFileSync("public/sitemap.xml", sitemap);
+console.log("Generated public/sitemap.xml");
