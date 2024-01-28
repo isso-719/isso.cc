@@ -1,0 +1,101 @@
+---
+title: やっぱ LaTeX 書くときに Overleaf 便利だねって話。
+date: 2024-01-28
+tags: AdventCalendar2023, LaTeX, Overleaf, 法政大学, 情報科学部
+summary: やっぱ LaTeX 書くときに Overleaf 便利だねって話。の記事です。
+author: isso
+---
+
+# 注意!!!
+
+この記事は昔の [Qiita記事](https://qiita.com/isso_719/items/e6f8bb6d2777e389d4a7) の移植です。
+記事の内容は2023年12月21日時点のもので、現在は古い情報が含まれている可能性があります。
+
+---
+
+こちらは 「[法政大学情報科学部 Advent Calendar 2023](https://qiita.com/advent-calendar/2023/cis_hosei)」 20 日目の記事になります。
+
+# はじめに
+このカレンダーもついに 3 年目ですね。今は 4 年で、もうすぐ (うまくいけば) 大学卒業です。
+現在、論文を執筆しているんですが、情報科学部は理系学部なので、LaTeX を使用した論文執筆を行う研究室が一定数あります。
+TeX Live + VS Code + LaTeX WorkShop なんかで書くのが今どきの TeX の書き方ですが、
+主に環境構築に時間 (No GUI で 5GB のダウンロード) がかかったり、設定多かったり、設定ちょっとでもミスるとエラー出たり、モジュール足りないって怒られたり...結構面倒で、
+さらにパソコン変えましたなんて言うと結構絶望的だし、設定した PC でしか書けないからスマホで移動時間に確認するなんてできないし...
+自分にとっては面倒が過ぎました。
+
+そんな時 [Overleaf](https://www.overleaf.com/) に出会って、感動したので、後輩にこう言う選択肢もあるんだぞってことでここに書いておきますね。
+
+# Overleaf とは
+インストール不要でブラウザベースで使用できる無料の LaTeX エディタです。
+オンラインでのコラボレーションとかもできます。
+スマートフォンでも (正直使いづらいですが、内容を確認するくらいなら) 使えます。
+
+https://www.overleaf.com/
+
+元々は Overleaf, ShareLaTeX という 2 つのプロジェクトがあったそうなのですが、
+Overleaf に吸収され、今は Overleaf v2 となっているらしいです。
+
+余談ですが、Overleaf (旧 ShareLaTeX) プロジェクトはオープンソース化されており、
+自分のサーバでセルフホスト使用することも可能となっています。
+Overleaf は、無料版だとコンパイル遅めなところがあるので、
+筆者はセルフホストした Overleaf に TeX Live の Full バージョンを入れて動かして、そこで論文を執筆しています。
+(ローカルで Docker Compose を使用して楽に執筆をできるようにもなっています)
+
+https://github.com/overleaf/overleaf
+
+# 使ってみよう
+実際にテンプレートを用いて書けるところまでやってみます。
+
+## アカウント登録
+アカウント登録は簡単で、Google アカウントのログイン一発でいけます。
+
+## 今回使用する TeX テンプレート
+今回は情報科学部の卒論サイトで公開されている日本語の LaTeX 抄録テンプレート + 文献ファイルを使用できるようにします。
+
+テンプレートは[こちら](https://cis.k.hosei.ac.jp/sotsuken/template/)。
+
+## アップロード
+ログインするとこんな感じの画面になっています。
+
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/161f0012-c929-6df0-5fc8-166312a78914.png)
+
+左上の [New Project] > [Upload Project] で ZIP 圧縮された形式のファイルがアップロードできるので、手に入れたテンプレートをアップロードします。
+
+もし ZIP 形式にするのが面倒だったら、
+[New Project] > [Blank Project] で空のプロジェクトを作成して、
+ファイルアップロードすることもできます。 (こっちの方がおすすめかも)
+
+## 書けるようにする
+そのままだと日本語が書けないってコンパイルエラーになるので、使えるようにしていきます。
+
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/32c5fb4a-a95c-0431-79fa-88adf832d0aa.png)
+
+左上の [Menu] > [Settings] > [Compiler] 項目の [pdfLaTeX] を [LaTeX] にします。
+
+次に [Menu] 下の [New File] (ファイルマーク) のボタンを押し、
+`latexmkrc` ファイルを作成します。
+
+作成したファイルに以下を記述します。
+
+それぞれの意味は、
+1 行目は、LaTeX コンパイル時に走るコマンドを記載しています。日本語には platex が対応しています。
+2 行目は、BibTeX (文献ファイル) コンパイル時に走るコマンドを記載しています。日本語には pbibtex が対応しています。
+3 行目は、LaTeX はコンパイル後に dvi と言うファイルを作成します。そのファイルを PDF 形式に変換するとき走るコマンドを記載しています。日本語には dvipdfmx が対応しています。
+
+```tex:latexmkrc
+$latex = 'platex';
+$bibtex = 'pbibtex';
+$dvipdf = 'dvipdfmx %O -o %D %S';
+```
+
+## Congratulations🎉
+これで書けるようになりましたね！
+PC にインストールするよりも楽に、そして早く執筆を開始できるようになりました!
+
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/cf052c01-056d-5d14-296d-58fb121a8c14.png)
+
+# 終わりに
+今年は論文執筆のために Overleaf おすすめするぞって記事書きました。
+これが後輩に届いて、早めに論文執筆に取り掛かれるようになることを願っています。
+
+卒業できるように頑張ります...。

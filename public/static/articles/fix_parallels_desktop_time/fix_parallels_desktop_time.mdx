@@ -1,0 +1,31 @@
+---
+title: Parallels Desktop の MacOS VM で時間が合わなくなるのでやったこと
+date: 2024-01-28
+tags: cron, Parallels, Mac, MacOSX
+summary: Parallels Desktop の MacOS VM で時間が合わなくなるのでやったこと の記事です。
+author: isso
+---
+
+# 注意!!!
+
+この記事は昔の [Qiita記事](https://qiita.com/isso_719/items/c8b495af103e871450c8) の移植です。
+記事の内容は2023年3月15日時点のもので、現在は古い情報が含まれている可能性があります。
+
+---
+
+(メモ)
+
+Parallels Desktop の MacOS VM を実行してる時に実行元の PC 本体をスリープすると時刻がズレてくので、ズレないようにする。
+
+cron で root 権限を用いて以下のコマンドを実行すれば良い。(時刻合わせのコマンド)
+
+`sntp -sS time.asia.apple.com`
+
+コマンドに落とし込むとこう。
+
+```bash
+sudo crontab -e
+
+###### 以下を出てきた Vim に追記する ######
+* * * * * sntp -sS time.asia.apple.com
+```

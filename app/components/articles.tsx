@@ -38,10 +38,8 @@ const Articles = ({jsonPath, tagName}: { jsonPath: string, tagName?: string }) =
                                 })}
                             </div>
                           </div>
-                          <div className="prose max-w-none text-gray-500 dark:text-gray-400">Release of
-                            Tailwind Nextjs Starter Blog template v2.0, refactored with Nextjs App
-                            directory and React Server Components setup.Discover the new features and
-                            how to migrate from V1.
+                          <div className="prose max-w-none text-gray-500 dark:text-gray-400">
+                            <p>{article.summary}</p>
                           </div>
                         </div>
                       </article>

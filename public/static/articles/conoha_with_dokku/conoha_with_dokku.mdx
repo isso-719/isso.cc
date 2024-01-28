@@ -1,0 +1,199 @@
+---
+title: ConoHaVPSのDokkuテンプレートでWebアプリを楽々デプロイ
+date: 2024-01-28
+tags: ConoHa, dokku, PaaS, Ruby, VPS
+summary: ConoHaVPSのDokkuテンプレートでWebアプリを楽々デプロイします。
+author: isso
+---
+
+# 注意!!!
+この記事は昔の [Qiita記事](https://qiita.com/isso_719/items/d4617d2bf352c7f0b90a) の移植です。
+記事の内容は2019年12月18日時点のもので、現在は古い情報が含まれている可能性があります。
+
+---
+
+# はじめに
+この記事は[ConoHa Advent Calendar 2019](https://qiita.com/advent-calendar/2019/conoha) 18日目の記事です。
+
+こんにちは、高校生プログラマーの[いっそ](https://twitter.com/intent/follow?ref_src=twsrc%5Etfw&region=follow_link&screen_name=i5so_&tw_p=followbutton)です。
+普段は趣味でRubyを用いたWebアプリケーションの製作をしています。
+今回Qiita初投稿&Advent Calendar初参加なので、このはちゃんとこうしてクリスマスまでカウントダウンができるのをとても嬉しく思いますし、ちょっと緊張もしてます...。
+とにかく!うまくフィーチャーできるように頑張るので今回はよろしくお願いします!
+
+# 本題
+今回は「[ConoHa](https://www.conoha.jp/)」VPSのテンプレートイメージを使って「[Dokku](http://dokku.viewdocs.io/dokku/)」を構築し、そこに実際に製作したWebアプリケーションをデプロイしていきたいと思います。
+あと、デプロイした「[このはちゃんに愛を叫びたい](https://conosake.isso.cc)」というWebサイトで__このはちゃんに「愛」を叫ぶってのもやりたいと思います。__
+
+## なぜ構築するか
+* 自分でカスタマイズ可能なPaaSを持てる
+* 本番環境のWebアプリケーションを簡単にデプロイできる
+* Always Onで訪問者の待機時間を減らせる
+* 独自ドメインの設定やSSL設定などをクレジットカードなしでできる(PaaSホスティングだとクレジットカードが必須で__高校生の立場__ではほぼ不可能)
+*  ConoHaは爆速でWebアプリケーションとの相性が抜群!
+* ConoHaのテンプレートイメージだから安定してるし、何より構築が楽
+* 以下の方法で行うとWebアプリを何個も建てれる!
+
+# Dokkuを構築してみる
+ConoHaVPSダッシュボード左上の__サーバー追加__をクリック。
+リージョンとVPSのスペックはお好みで(私は高校生で__お金がない__ので、手軽な東京の1コアCPU、メモリ512MB、SSD20GBを選択しました)。
+次にイメージタイプですが、__アプリケーションタブ__の__Dokku__を選択します。
+あとはお好みのrootパスワード、ネームタグ(サーバーの名前)を付けます。
+追加をクリックすると20秒程でサーバーが作られます。
+__実質これがPaaSを建てたってことで!超簡単ですね!__
+## Dokkuの設定
+次に実際に使えるように設定していきます。
+サーバーリストから先ほど追加したサーバーのネームタグを選択。
+ネットワーク情報の__IPアドレス__にブラウザでアクセスします。
+すると__Dokku Setup__と言う画面が出ます。
+
+__Admin Access__にはデプロイ元のパソコンの__公開鍵__を入力します。
+公開鍵は```~/.ssh/id_rsa.pub```と言うファイルの```ssh-rsa```などから始まる文字列を使用します。
+
+__Hostname__にはConoHaのIPアドレスを指定します。
+__IPアドレスが"-"で区切られてるので、それを"."に置き換えれば大丈夫だと思います。__
+
+Finish Setupをクリックして設定を終了します。
+これでDokkuのデプロイを受け取る設定は終わりました。
+# 今回デプロイするWebアプリの紹介
+![ogp.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/74284edc-4ec0-1afd-f236-6f6b6addfa23.png)
+今回私が製作したのは「[このはちゃんに愛を叫びたい](https://conosake.isso.cc)(通称:このさけ)」です!
+Webアプリとしてはシンプルでこのはちゃんへの愛を投稿するシステムになってます。
+シンプルな分読み込みのパフォーマンスも高く、デスクトップVerの[PageSpeed Insights](https://developers.google.com/speed/pagespeed/insights/)では常に95%以上を叩き出すくらい速いです。
+![aff4f648-521d-661c-0d3b-6ead80c6739e.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/aff4f648-521d-661c-0d3b-6ead80c6739e.png)
+このアプリとConoHaのVPSとは非常に相性が良く、VPSの速さを皆さんのブラウザでも体験してもらえるのではないかなと考えています。
+
+# いよいよWebアプリをデプロイ
+さて話を本題に戻し、「[このさけ](https://conosake.isso.cc)」をデプロイしていきたいと思います。
+
+まずはDokku上にアプリの__コンテナ__(格納場所)を作成します。
+
+  ```shell:Create_App
+  # Dokkuホスト上で
+  #アプリケーション名は好きな名前を付ける
+  dokku apps:create アプリケーション名
+  #dokku apps:create conosake
+  ```
+
+次にデータベースに__Postgres__を使用するので__プラグインのインストール__と__データベースコンテナ__の作成をします。
+
+  ```shell:Make_Database
+  # Dokkuホスト上で
+  sudo dokku plugin:install https://github.com/dokku/dokku-postgres.git
+
+  #データベース名はアプリケーション名と違う名前を付ける
+  dokku postgres:create データベース名
+  #dokku postgres:create conosakedatabase
+  ```
+
+そしてこれまで作ったアプリとデータベースを関連付けしていきます。
+
+  ```shell:Link_App&Database
+  #Dokkuホスト上で
+  dokku postgres:link データベース名 アプリケーション名
+  #dokku postgres:link conosakedatabase conosake
+  ```
+
+これでデプロイされたアプリを受け取る準備が整いました。
+ローカルでのデプロイ作業に移ります。
+デプロイには__Git__を使用していきます。
+
+  ```shell:Deploy_App
+  #ローカルで
+  cd アプリの場所
+
+  git init
+  git add -A .
+  git commit -m 'First deploy'
+
+  git remote add dokku dokku@VPSのIPアドレス:アプリ名
+  #git remote add dokku dokku@123.456.789.012:conosake
+
+  git push dokku master
+  ```
+yes/noが出てきたら全てyesにしましょう。
+
+  ```
+  =====> Application deployed:
+  http://123.456.789.012:34567
+
+  To 123.456.789.012:アプリケーション名
+  * [new branch] master -> master
+  ```
+となればデプロイ完了です。
+しかし、このままでは"Internal Server
+Error"と表示されてしまうのでDokkuのデータベースでマイグレーション処理を行います(そのまま表示され、正常に稼働しているならこの設定は必要ないかもしれません)。
+```dokku run アプリケーション名```の後にコマンドを入力するとDokku上でコマンドを実行できます。
+データベースを最新のものにしましょう。
+
+  ```shell:Database_Migration
+  #Dokkuホスト上で
+  #例はrakeを用いた際のマイグレーションコマンド。適宜読み替えてください。
+
+  dokku run アプリケーション名 マイグレーションコマンド
+  #dokku run conosake rake db:migrate
+  ```
+ローカルコンソール上の```=====> Application deployed:```の下に表示されているURLにブラウザでアクセスします。
+これで__あなたのアプリ__が__Dokku上で使えるように__なりました!__おめでとうございます__🎉
+
+# Webアプリの設定をする
+このままではIPアドレスがモロに出ていて、またSSLも適用されていないのでWebアプリとしてはかなり致命的な状況になっています。
+しかしDokkuでは独自ドメインの設定やLet's Encryptを用いたSSL認証が簡単に行えます!
+今回はそこまでやってみたいと思います。
+
+## 独自ドメインの設定
+まずドメインの__DNSレコードを設定__します。
+__Aレコード__でVPSの__IPアドレス__を指定し、追加します。
+
+次にDokkuでアクセスできるように設定していきます。
+
+  ```shell:Add_Domain
+  #Dokkuホスト上で
+  dokku domains:add アプリケーション名 ドメイン名
+  #dokku domains:add conosake conosake.isso.cc
+  ```
+これでアプリケーションと独自ドメインが接続されました!
+## Let's Encryptの設定
+こちらは[dokku-letsencrypt (Beta)](https://github.com/dokku/dokku-letsencrypt)というプラグインを使用して設定します。
+
+  ```shell:Set_Let'sEncrypt
+  #dokkuホスト上で
+  sudo dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
+
+  dokku config:set --no-restart アプリケーション名 DOKKU_LETSENCRYPT_EMAIL=e-mailアドレス
+  #dokku config:set --no-restart conosake DOKKU_LETSENCRYPT_EMAIL=mail@example.com
+
+  dokku letsencrypt アプリケーション名
+  #dokku letsencrypt conosake
+
+  dokku letsencrypt:auto-renew
+  ```
+これでSSL証明書も設定されましたし、自動で更新してくれる設定にもなりました!
+
+# いくつでもアプリをデプロイ可能に
+実は前述の「__[いよいよWebアプリをデプロイ](#いよいよwebアプリをデプロイ)__」から「__[Let's
+Encryptの設定](https://qiita.com/isso_719/private/d4617d2bf352c7f0b90a#lets-encrypt%E3%81%AE%E8%A8%AD%E5%AE%9A)__」までを__繰り返す__ことでいくつでもアプリをデプロイすることができます。
+仕組みとしては全てのコンテナにポート番号が割り振られているためです。
+ドメインもアクセスしたドメインを検知して自動的にアプリとつなげているのだと思います。
+今回は詳しくは扱いませんが参考にしてみてください。
+因みにこれを行うためには__スペックの良いサーバー__を使うようにしてください。
+管理するアプリが多すぎて処理しきれない場合があります。
+
+# 早速愛を叫びます。
+早速、ある意味本題の__このはちゃんに「愛」を叫ぶ__ってことをやっていきたいと思います。![ezgif.com-video-to-gif.gif](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/6f4e0cce-0b34-6c1b-087a-9a8fe53d55ca.gif)
+私は控えめに叫びましたが、皆さんはぜひもっともっと__熱く叫んで__ください!
+投稿は以下で行うことができます!
+[このはちゃんに叫びたい](https://conosake.isso.cc)
+
+# さいごに
+今回はConoHaVPSのDokkuテンプレートを用いてPaaSの構築を行ってみました。
+
+初めての記事ちゃんと書けてたちょっと心配です.....。
+けれど、少なからずConoHaのアプリケーションテンプレートの利便性と、自分でPaaSを作って自分のアプリをデプロイする楽しさってのは伝わったんじゃないかなって思ってます。
+だからこの記事を読んでる皆さんも是非この楽しさを1回体感してみてください!
+
+__来年も参加できる機会があれば参加したいと思います!__
+__どうもありがとうございました!__
+
+p.s.
+何かあればお気軽にコメントよろしくお願いします。
+是非[Twitter](https://twitter.com/intent/follow?ref_src=twsrc%5Etfw&region=follow_link&screen_name=i5so_&tw_p=followbutton)などにも足を運んでいただけると励みになります😍

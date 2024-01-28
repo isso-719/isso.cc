@@ -1,0 +1,276 @@
+---
+title: Sinatra + faye-websocket でリアルタイムチャットを実装する
+date: 2024-01-28
+tags: Ruby, Sinatra, WebSocket, Gem
+summary: Sinatra + faye-websocket でリアルタイムチャットを実装する の記事です。
+author: isso
+---
+
+# 注意!!!
+
+この記事は昔の [Qiita記事](https://qiita.com/isso_719/items/e9848213fb6786b34f68) の移植です。
+記事の内容は2023年3月10日時点のもので、現在は古い情報が含まれている可能性があります。
+
+---
+
+# はじめに
+
+こんにちは、いっそです！
+今回は、Sinatra + faye-websocket でリアルタイム通信を実現し、
+その上でリアルタイムに動く、簡単なチャットアプリを作っていきたいと思います！
+
+一応、記事読みたくない人向けに...(そんなの悲しい)
+完成版コードは[こちら](https://github.com/isso-719/faye-websocket-tutorial)
+
+# WebSocket ってなに
+
+WebSocketは、双方向通信を行うためのWebプロトコルの一つです。HTTP通信のようなリクエスト・レスポンスモデルではなく、クライアントとサーバーが接続を維持し、双方向にデータを送信することができます。
+
+通常、HTTPプロトコルではクライアントがサーバーにリクエストを送信すると、サーバーはレスポンスを返しますが、それ以外の情報を送信するためには別のリクエストを送信する必要があります。一方、WebSocketを使用すると、クライアントとサーバーは接続を維持し、データを送信することができます。このような接続を使うことで、リアルタイムな情報を送信することができます。たとえば、ストリーミングビデオやチャットアプリケーションなどがこれにあたります。
+
+# faye-websocket ってなに
+
+簡単にいうと Ruby で WebSocket を実現することができるライブラリの １ つです。
+ソースコードは[こちら](https://github.com/faye/faye-websocket-ruby)
+
+# 実際にチャットアプリを作ってみる
+
+今回、使用する Web サーバに WEBrick が使用できないことから、Puma を導入しているなど、必要な gem が少し変わってたりするため、初期コードを用意しています。初期コードは[こちら](https://github.com/isso-719/faye-websocket-tutorial/tree/init)。
+
+## app.rb の実装
+
+まず、`app.rb` からです。
+
+```diff_ruby
+require 'bundler/setup'
+Bundler.require
+require 'sinatra/reloader' if development?
++ require 'faye/websocket'
+
++ set :sockets, []
+
+get '/' do
+  erb :index
+end
+
++ get '/websocket' do
++   if Faye::WebSocket.websocket?(request.env)
++     ws = Faye::WebSocket.new(request.env)
+
++     ws.on :open do |event|
++       settings.sockets << ws
++     end
+
++     ws.on :message do |event|
++       settings.sockets.each do |socket|
++         socket.send(event.data)
++       end
++     end
+
++     ws.on :close do |event|
++       ws = nil
++       settings.sockets.delete(ws)
++     end
+
++     ws.rack_response
++   end
++ end
+```
+
+1 つづつ見ていきましょう。
+
+まず、`require` 句を用いて、外部ライブラリである `faye/websocket` を利用できるようにしています。
+そして、`set :sockets, []` で、WebSocket に接続してきたクライアントの情報を `:sockets` に格納できるようにします。
+
+```ruby:app.rb
+require 'faye/websocket'
+
+set :sockets, []
+```
+
+次に `/websocket` にルーティングを貼り、ここにアクセスしてきたら、WebSocket 通信にアップグレード(常時通信モードに変更)できるようにします。
+`Faye::WebSocket.websocket?` で WebSocket のリクエストかどうかを判別し、
+もし WebSocket 通信であれば、
+`Faye::WebSocket.new(request.env)` で WebSocket のコネクションインスタンスを取得することができるため、
+`ws` 変数にその情報を格納します。
+
+```ruby:app.rb
+get '/websocket' do
+  if Faye::WebSocket.websocket?(request.env)
+    ws = Faye::WebSocket.new(request.env)
+```
+
+次に WebSocket 通信を開始した時のトリガーを設定します。
+以下のようにすることで、WebSocket 通信が開始した時の処理を記述することができ、
+ここでは `app.rb` の最初で設定した `:sockets` に接続してきたクライアントの情報を格納する処理を記述しています。
+
+
+```ruby:app.rb
+    ws.on :open do |event|
+      settings.sockets << ws
+    end
+```
+
+次に WebSocket 通信でイベントを受信した時のトリガーを設定します。
+以下のようにすることで、WebSocket 通信でメッセージを取得した時の処理を記述することができ、
+ここでは全てのクライアントに、送信元のクライアントから送られてきたメッセージをそのまま送る処理を書いています。
+
+```ruby:app.rb
+    ws.on :message do |event|
+      settings.sockets.each do |socket|
+        socket.send(event.data)
+      end
+    end
+```
+
+最後に WebSocket 通信を切断した時のトリガーを設定します。
+以下のようにすることで、WebSocket 通信を切断した時の処理を記述することができます。
+
+```ruby:app.rb
+    ws.on :close do |event|
+      ws = nil
+      settings.sockets.delete(ws)
+    end
+```
+
+## index.erb の実装
+
+次に index.erb の実装です。
+
+初期コードとの差分は以下の通りです。
+
+```diff_erb:index.erb
+ <body>
+-     <h1>Hello World!</h1>
++     <input type="text" name="username" placeholder="username" />
++     <input type="text" name="message" placeholder="message" />
++     <button>送信</button>
+
++     <div id="messages"></div>
+
+
++     <script>
++       if (location.protocol === 'https:') {
++         var ws = new WebSocket('wss://' + location.host + '/websocket');
++       } else {
++         var ws = new WebSocket('ws://' + location.host + '/websocket');
++       }
+
++       ws.onopen = function() {
++         console.log('connected');
++       };
+
++       ws.onmessage = function(e) {
++         var data = JSON.parse(e.data);
++         var message = document.createElement('div');
++         message.innerHTML = '<strong>' + data.username + '</strong>: ' + data.message;
++         document.querySelector('#messages').appendChild(message);
++       };
+
++       ws.onclose = function() {
++         console.log('disconnected');
++       };
+
++       document.querySelector('button').addEventListener('click', function() {
++         var username = document.querySelector('input[name="username"]').value;
++         var message = document.querySelector('input[name="message"]').value;
++         ws.send(JSON.stringify({
++           username: username,
++           message: message
++         }));
++       });
++     </script>
+ </body>
+```
+
+まず、HTML のコードから見ていきます。
+
+テキストボックス 2 つと、ボタン １ つ、そしてメッセージを格納するための div があります。
+
+```erb:index.erb
+    <input type="text" name="username" placeholder="username" />
+    <input type="text" name="message" placeholder="message" />
+    <button>送信</button>
+
+    <div id="messages"></div>
+```
+
+次に `<script>` で囲まれた JavaScript 部です。
+
+まず、WebSocket 通信を行う通信先の定義をします。
+先ほどルーティングを設定した `/websocket` に合わせます。
+ここで、if 文などが登場している理由ですが、
+WebSocket 通信を行う上で、
+`https://` 通信を行なっている場合は `wss://` プロトコルを、
+`http://` 通信を行なっている場合は `ws://` プロトコルを、
+使用しないと、プロトコルエラーが発生してしまうためです。
+
+```javascript:index.erb
+      if (location.protocol === 'https:') {
+        var ws = new WebSocket('wss://' + location.host + '/websocket');
+      } else {
+        var ws = new WebSocket('ws://' + location.host + '/websocket');
+      }
+```
+
+次に WebSocket 通信を開始した時のトリガーを設定します。
+今回はコンソールに `connected` って出るようにします。
+
+```javascript:index.erb
+      ws.onopen = function() {
+        console.log('connected');
+      };
+```
+
+次に WebSocket 通信でメッセージを取得した時のトリガーを設定します。
+今回は先ほど用意した div にユーザ名とメッセージを挿入します。
+
+```js:index.erb
+      ws.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+        var message = document.createElement('div');
+        message.innerHTML = '<strong>' + data.username + '</strong>: ' + data.message;
+        document.querySelector('#messages').appendChild(message);
+      };
+```
+
+次に WebSocket 通信が切断された時のトリガーを設定します。
+今回はコンソールに `disconnected` と表示されます。
+
+```js:index.erb
+      ws.onclose = function() {
+        console.log('disconnected');
+      };
+```
+最後に送信ボタンが押された時の処理を書きます。
+JavaScript のイベントトリガーを利用します。
+送信するデータは JSON 形式を採用しました。
+
+```js:index.erb
+      document.querySelector('button').addEventListener('click', function() {
+        var username = document.querySelector('input[name="username"]').value;
+        var message = document.querySelector('input[name="message"]').value;
+        ws.send(JSON.stringify({
+          username: username,
+          message: message
+        }));
+      });
+```
+
+# 実際に動かしてみよう!
+
+これで実装は完了です！
+実際に動かしてみましょう。
+
+以下の GIF を見てみると、右側のウィンドウのテキスト欄に入力した名前とメッセージが、
+左側のウィンドウに送信されていることがわかり、
+その逆もできていることがわかります！
+
+![画面収録-2023-03-10-3.47.32.gif](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/cb1e649f-ec16-b240-b2a6-c6c80031c936.gif)
+
+# おわりに
+
+今回は Sinatra + faye-websocket でリアルタイムチャットを実装してみました。
+リアルタイム通信ができると開発できる作品の幅が広がるので良いですね！
+
+完成版コードは[こちら](https://github.com/isso-719/faye-websocket-tutorial)

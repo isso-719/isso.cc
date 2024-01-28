@@ -1,0 +1,392 @@
+---
+title: Docker が俺の Postgres を勝手に全世界に公開しやがって色々怒られた話
+date: 2024-01-28
+tags: Docker, PostgreSQL, iptables, yarakashi, AdventCalendar2023
+summary: Docker が俺の Postgres を勝手に全世界に公開しやがって色々怒られた話の記事です。
+author: isso
+---
+
+# 注意!!!
+
+この記事は昔の [Qiita記事](https://qiita.com/isso_719/items/c22e617986c821b2f624) の移植です。
+記事の内容は2024年1月9日時点のもので、現在は古い情報が含まれている可能性があります。
+
+---
+
+こちらは 「[本番環境などでやらかしちゃった人 Advent Calendar 2023](https://qiita.com/advent-calendar/2023/yarakashi)」 22 日目の記事になります。
+
+# はじめに
+Happy Coding!🤶
+みなさん年末いかがお過ごしでしょうか。
+私は卒論の抄録執筆が終わらないし、今年体調崩しまくってるしで泣きそうです😭
+
+この記事では昔々あるところで起こった「Docker が俺の Postgres を勝手に全世界に公開しやがって色々怒られた話」について述べていきたいと思います。
+
+※所属団体の関係で、**技術的な話以外のところ**の一部で詳しく話せないところはぼかしたり、デタラメなことで置き換えたりしています。ご了承ください。
+
+# 簡単な自己紹介
+
+私は大学 4 年で、働いているという訳でもなく、
+個人やちょっとした団体で Web アプリや API サーバなどを作って、みんなが使えるようにしています。
+
+# 背景
+
+今回は数年前に起こった、とある団体でのお話です。
+
+:::note info
+こちらの記事は数年前に起こったことを題材にしています。(ここ重要)
+:::
+
+## サービス構成
+
+そこではオンプレミスに近い環境で、以下のような構成のアプリをデプロイしています。
+(小さめの個人開発とかだとよくある構成だと思います)
+- RHEL 系 OS (今は 9.x)
+- Nginx Proxy を使用してプロキシを組んでいる
+- 443/tcp  -> 3000/tcp のフロントエンドサーバに
+- 8443/tcp -> 8080/tcp のバックエンドサーバに
+- Docker によって 3 つのサービスが立ち上げられている
+- フロントエンドサーバ (3000/tcp -> 3000/tcp)
+- バックエンドサーバ  (8080/tcp -> 8080/tcp)
+- PostgreSQL     (5432/tcp -> 5432/tcp)
+
+![アセット 3.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/d8d1d1a5-ee5c-f153-b330-8280cadfa7da.png)
+
+## ファイアウォール
+
+もちろん外部公開するサーバなので、セキュリティもしっかりとしなければなりません。
+私は Linux に搭載されたパケットフィルタリング型のファイアウォール機能 iptables を用いて、22/tcp, 443/tcp, 8443/tcp 以外のリクエストを許可しないような設定をしていました。
+
+```iptables:/etc/sysconfig/iptables
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+:SUBNET - [0:0]
+
+# lo
+-A INPUT -i lo -j ACCEPT
+
+# Drops
+-A INPUT -p tcp --tcp-flags ALL NONE -j DROP
+-A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+-A INPUT -p tcp --tcp-flags ALL ALL -j DROP
+
+# Accept Rules
+-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 8443 -j ACCEPT
+-A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+-A INPUT -j REJECT --reject-with icmp-host-prohibited
+
+COMMIT
+```
+
+# 問題発覚
+
+サービスを動かしてしばらくした後、団体のサーバ群を脆弱性診断にかけたっぽいです。
+その結果...
+```plaintext:脆弱性診断結果 (サンプル)
+ホスト診断結果: レベル High, 早急に対応が必要です
+
+内容:
+PostgreSQL に総当たり攻撃を仕掛けることでログインが可能。
+攻撃者にデータを書き換えられたり、OS コマンドを実行される危険性あり。
+ユーザ名: postgres
+パスワード: hogehoge
+
+対策:
+必要最低限の IP アドレスのみからアクセスできるように制限してください。
+```
+
+オワタ😇 (認証情報まで当ててくるんや、すごい...)
+ってことで、すごく怒られてしまいました...。
+
+これがメールで転送されてきた時、すごく顔が青ざめたことを今でも思い出します...。
+
+# 原因
+
+原因は 2 つ考えられます。
+
+## パスワードが簡単なものになっていた
+
+これは本当に私が悪いです。
+振り返ると短めで推測されやすいものになっていたからです。
+また、ユーザ名も `postgres` になっていました...。
+
+この出来事から、Postgres のユーザ、パスワード、データベース名などは、
+以下のような形でランダム生成し、
+信頼できるパスワードマネージャーにおいて管理するようになりました。
+
+```zsh
+% openssl rand -base64 12
+NjkuJWWwf9MmN5j4
+```
+
+## ファイアウォールの設定が変わってた? [本命]
+
+問題はここです。
+確かに iptables では 22/tcp, 443/tcp, 8443/tcp ポートしか空いていなかったはず。
+Postgres のポートは 5432/tcp で iptables の設定を見ても開いているような感じはしませんでした。
+
+# Docker と iptables
+
+原因は Docker でした。
+
+[Docker のドキュメント](https://docs.docker.jp/network/iptables.html)を見るととんでもないことが書いてありました。
+
+```
+デフォルトでは、全ての外部ソース IP アドレスから Docker ホストに接続できます。
+```
+
+な、なんだとっ ！！！！！
+
+なんと **Docker が俺の Postgres を勝手に全世界に公開しやがっていた**らしいです。
+
+それだけでなく、フロントエンドサーバもバックエンドサーバも、
+全てプロキシを通じずにアクセスできるようになっていました。
+
+手元の環境で試したら、
+確かに Docker のデーモン起動前と起動後で iptables の設定が大きく変わっており、
+Docker で建てたコンテナが全て外部から閲覧できるようになっていました。
+
+- Docker Daemon 起動前
+  ```bash:Docker Daemon 起動前の iptables の設定
+  # iptables -L
+  Chain INPUT (policy DROP)
+  target     prot opt source               destination
+  ACCEPT     all  --  anywhere             anywhere
+  DROP       tcp  --  anywhere             anywhere             tcp flags:FIN,SYN,RST,PSH,ACK,URG/NONE
+  DROP       tcp  --  anywhere             anywhere             tcp flags:!FIN,SYN,RST,ACK/SYN state NEW
+  DROP       tcp  --  anywhere             anywhere             tcp flags:FIN,SYN,RST,PSH,ACK,URG/FIN,SYN,RST,PSH,ACK,URG
+  ACCEPT     tcp  --  anywhere             anywhere             tcp dpt:ssh
+  ACCEPT     tcp  --  anywhere             anywhere             tcp dpt:https
+  ACCEPT     tcp  --  anywhere             anywhere             tcp dpt:pcsync-https
+  ACCEPT     all  --  anywhere             anywhere             state RELATED,ESTABLISHED
+  REJECT     all  --  anywhere             anywhere             reject-with icmp-host-prohibited
+
+  Chain FORWARD (policy DROP)
+  target     prot opt source               destination
+
+  Chain OUTPUT (policy ACCEPT)
+  target     prot opt source               destination
+
+  Chain SUBNET (0 references)
+  target     prot opt source               destination
+    ```
+
+- Docker Daemon 起動後
+  ```bash:Docker Daemon 起動後の iptables の設定
+  # systemctl start docker
+  # iptables -L
+  Chain INPUT (policy DROP)
+  target     prot opt source               destination
+  ACCEPT     all  --  anywhere             anywhere
+  DROP       tcp  --  anywhere             anywhere             tcp flags:FIN,SYN,RST,PSH,ACK,URG/NONE
+  DROP       tcp  --  anywhere             anywhere             tcp flags:!FIN,SYN,RST,ACK/SYN state NEW
+  DROP       tcp  --  anywhere             anywhere             tcp flags:FIN,SYN,RST,PSH,ACK,URG/FIN,SYN,RST,PSH,ACK,URG
+  ACCEPT     tcp  --  anywhere             anywhere             tcp dpt:ssh
+  ACCEPT     tcp  --  anywhere             anywhere             tcp dpt:https
+  ACCEPT     tcp  --  anywhere             anywhere             tcp dpt:pcsync-https
+  ACCEPT     all  --  anywhere             anywhere             state RELATED,ESTABLISHED
+  REJECT     all  --  anywhere             anywhere             reject-with icmp-host-prohibited
+
+  Chain FORWARD (policy DROP)
+  target     prot opt source               destination
+  DOCKER-USER  all  --  anywhere             anywhere
+  DOCKER-ISOLATION-STAGE-1  all  --  anywhere             anywhere
+  ACCEPT     all  --  anywhere             anywhere             ctstate RELATED,ESTABLISHED
+  DOCKER     all  --  anywhere             anywhere
+  ACCEPT     all  --  anywhere             anywhere
+  ACCEPT     all  --  anywhere             anywhere
+  ACCEPT     all  --  anywhere             anywhere             ctstate RELATED,ESTABLISHED
+  DOCKER     all  --  anywhere             anywhere
+  ACCEPT     all  --  anywhere             anywhere
+  ACCEPT     all  --  anywhere             anywhere
+
+  Chain OUTPUT (policy ACCEPT)
+  target     prot opt source               destination
+
+  Chain DOCKER (2 references)
+  target     prot opt source               destination
+
+  Chain DOCKER-ISOLATION-STAGE-1 (1 references)
+  target     prot opt source               destination
+  DOCKER-ISOLATION-STAGE-2  all  --  anywhere             anywhere
+  DOCKER-ISOLATION-STAGE-2  all  --  anywhere             anywhere
+  RETURN     all  --  anywhere             anywhere
+
+  Chain DOCKER-ISOLATION-STAGE-2 (2 references)
+  target     prot opt source               destination
+  DROP       all  --  anywhere             anywhere
+  DROP       all  --  anywhere             anywhere
+  RETURN     all  --  anywhere             anywhere
+
+  Chain DOCKER-USER (1 references)
+  target     prot opt source               destination
+  RETURN     all  --  anywhere             anywhere
+
+  Chain SUBNET (0 references)
+  target     prot opt source               destination
+    ```
+
+- ポートスキャン (イメージ)
+  ```bash:ポートスキャン結果 (イメージ)
+  % nmap hogehoge.example.com
+  …
+  PORT     STATE    SERVICE
+  22/tcp   open     ssh
+  443/tcp  open     https
+  3000/tcp open     front
+  5432/tcp open     postgresql
+  8080/tcp open     api
+  8443/tcp open     http-proxy
+  …
+    ```
+
+こんな落とし穴があるなんて...とほほ...🥺
+
+**この現象は ufw など他のファイアウォールでも発生するそうです。**
+(iptables じゃないからって安心してるそこのあなたも注意！)
+
+https://tec.tecotec.co.jp/entry/2021/12/17/000000
+
+# 問題の解決
+
+[Docker のドキュメント](https://docs.docker.jp/network/iptables.html)を見ると、このようなことも書いてありました。
+
+```
+コンテナに対して特定の IP アドレスもしくはネットワークからのみ許可するには、
+DOCKER-USER フィルタ チェインの一番上に
+無効化ルールを追加します。
+たとえば、以下のルールは 192.168.1.1 を除く全ての外部アクセスを制限します。
+
+$ iptables -I DOCKER-USER -i ext_if ! -s 192.168.1.1 -j DROP
+```
+
+どうやら iptables の設定に DOCKER-USER フィルタチェインのルールを追加すれば解決しそうです。
+Docker はプライベート IP アドレスのクラス B (172.16.0.0/12) の中で IP を割り振るため、
+外からは 172.16.0.0/12 からのアクセスのみを許可するようにして、
+それ以外は許可しないようにします。
+
+```iptables:/etc/sysconfig/iptables
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+:SUBNET - [0:0]
+
+# DOCKER-USER Filter を追加
+:DOCKER-USER - [0:0]
+
+# lo
+-A INPUT -i lo -j ACCEPT
+
+# Drops
+-A INPUT -p tcp --tcp-flags ALL NONE -j DROP
+-A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+-A INPUT -p tcp --tcp-flags ALL ALL -j DROP
+
+# Accept Rules
+-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 8443 -j ACCEPT
+-A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+-A INPUT -j REJECT --reject-with icmp-host-prohibited
+
+#
+# ここから DOCKER-USER Chain 設定
+#
+-A DOCKER-USER -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A DOCKER-USER -s 172.16.0.0/12 -j ACCEPT
+-A DOCKER-USER -j REJECT
+
+COMMIT
+```
+
+設定を確認すると、
+`Docker Daemon 起動後の iptables の設定` と比較して、
+設定できているような気がします。
+
+```bash:DOCKER-USER Filter Chain 追加後の iptables の設定
+Chain INPUT (policy DROP)
+target     prot opt source               destination
+ACCEPT     all  --  anywhere             anywhere
+DROP       tcp  --  anywhere             anywhere             tcp flags:FIN,SYN,RST,PSH,ACK,URG/NONE
+DROP       tcp  --  anywhere             anywhere             tcp flags:!FIN,SYN,RST,ACK/SYN state NEW
+DROP       tcp  --  anywhere             anywhere             tcp flags:FIN,SYN,RST,PSH,ACK,URG/FIN,SYN,RST,PSH,ACK,URG
+ACCEPT     tcp  --  anywhere             anywhere             tcp dpt:ssh
+ACCEPT     tcp  --  anywhere             anywhere             tcp dpt:https
+ACCEPT     tcp  --  anywhere             anywhere             tcp dpt:pcsync-https
+ACCEPT     all  --  anywhere             anywhere             state RELATED,ESTABLISHED
+REJECT     all  --  anywhere             anywhere             reject-with icmp-host-prohibited
+
+Chain FORWARD (policy DROP)
+target     prot opt source               destination
+DOCKER-USER  all  --  anywhere             anywhere
+DOCKER-ISOLATION-STAGE-1  all  --  anywhere             anywhere
+ACCEPT     all  --  anywhere             anywhere             ctstate RELATED,ESTABLISHED
+DOCKER     all  --  anywhere             anywhere
+ACCEPT     all  --  anywhere             anywhere
+ACCEPT     all  --  anywhere             anywhere
+ACCEPT     all  --  anywhere             anywhere             ctstate RELATED,ESTABLISHED
+DOCKER     all  --  anywhere             anywhere
+ACCEPT     all  --  anywhere             anywhere
+ACCEPT     all  --  anywhere             anywhere
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+
+Chain DOCKER (2 references)
+target     prot opt source               destination
+
+Chain DOCKER-ISOLATION-STAGE-1 (1 references)
+target     prot opt source               destination
+DOCKER-ISOLATION-STAGE-2  all  --  anywhere             anywhere
+DOCKER-ISOLATION-STAGE-2  all  --  anywhere             anywhere
+RETURN     all  --  anywhere             anywhere
+
+Chain DOCKER-ISOLATION-STAGE-2 (2 references)
+target     prot opt source               destination
+DROP       all  --  anywhere             anywhere
+DROP       all  --  anywhere             anywhere
+RETURN     all  --  anywhere             anywhere
+
+Chain DOCKER-USER (1 references)
+target     prot opt source               destination
+ACCEPT     all  --  anywhere             anywhere             ctstate RELATED,ESTABLISHED
+ACCEPT     all  --  172.16.0.0/12        anywhere
+REJECT     all  --  anywhere             anywhere             reject-with icmp-port-unreachable
+RETURN     all  --  anywhere             anywhere
+
+Chain SUBNET (0 references)
+target     prot opt source               destination
+```
+
+外部からポートスキャンをすると、22/tcp, 443/tcp, 8443/tcp 以外は見れていないことがわかりました！
+
+```bash:ポートスキャン結果 (イメージ)
+% nmap hogehoge.example.com
+…
+PORT     STATE    SERVICE
+22/tcp   open     ssh
+443/tcp  open     https
+8443/tcp open     http-proxy
+…
+```
+
+# まとめ
+
+今回は Docker によって iptables の設定が勝手に変えられ、
+隠すべき Postgres が公開されてしまった話を述べてきました！
+
+Docker によって iptables や ufw に穴を開けられる話は、
+調べた感じかなり有名な話っぽいですが、
+**僕と同じことをやらかしてしまっている人は多い**のではないかと思います。
+
+公開サーバで Docker を動かしている人は、
+今一度 iptables の設定を見直すことをおすすめします。
+
+以上、良いお年を...🎅

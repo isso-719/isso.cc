@@ -1,0 +1,159 @@
+---
+title: Javaの授業をIntelliJ IDEAで受ける!
+date: 2024-01-28
+tags: Java, IntelliJ, IntelliJIdea, 法政大学, 情報科学部
+summary: Javaの授業をIntelliJ IDEAで受ける!の記事です。
+author: isso
+---
+
+# 注意!!!
+
+この記事は昔の [Qiita記事](https://qiita.com/isso_719/items/dada333f1428348a946d) の移植です。
+記事の内容は2021年12月20日時点のもので、現在は古い情報が含まれている可能性があります。
+
+---
+
+# はじめに
+この記事は [法政大学情報科学部 Advent Calendar 2021](https://qiita.com/advent-calendar/2021/cis_hosei) 20日目の記事です。
+
+こんにちは、情報科学部の磯貝です。もうすぐクリスマスが近づき、Qiita の Advent Calender も終盤が迎えようとしてます...ね?
+今回は、ある一定の学部生から質問があった Eclipse じゃなくて __IntelliJ IDEA を Java の授業で使用したい__ というものについて解説していきたいと思います。2021/12/20 現在、実際に授業で使用することができているので、ぜひこれから解説することをやってみてください！ _(学部生の授業環境を良くするシリーズ? 笑)_
+
+# IntelliJ IDEA とは
+IntelliJ IDEA はチェコにある JetBrains社 が開発した IDE (統合開発環境)のことです。主に Java 向けの開発ツールですが、Java 以外のプログラミング言語も開発できます。
+なお、授業で使用している Eclipse は、2014 年までは IntelliJ よりもシェアが伸びていましたが、現在では IntelliJ の方がシェアを伸ばしています。つまり、__IntelliJ は Java 開発におけるモダンな IDE__ と言えるでしょう。
+
+今回はそんなモダンな IntelliJ に乗り換えていきます。
+
+# ダウンロード
+では、実際にダウンロードをしていきます。
+[ダウンロード IntelliJ IDEA](https://www.jetbrains.com/ja-jp/idea/download/) を開き、__Community__ と書かれたセクションにあるダウンロードボタンをクリックします。この時、ダウンロードボタンの横の拡張子が __.exe__ になっていることを確認してください。
+![スクリーンショット 2021-12-17 3.16.51.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/02a49cb5-3a7d-c3de-fbea-67edceef2aae.png)
+
+# インストール
+ダウンロードしたプログラムを実行してください (2021/12/20 現在、 ideaIC-2021.3.exe というプログラム名となっています)。
+そしてひたすらウィンドウ下に表示されている __[ Next > ]__ をクリックして、インストールを完了させてください。
+
+__Completing IntelliJ IDEA Community Edition Setup__ という画面が表示されたら、__Run IntelliJ IDEA Community Edition__　にチェックを入れ、 __[ Finish ]__ をクリックします。
+
+# 初回起動する
+初回起動を行い、IntelliJ IDEA を起動します。
+
+__JETBRAINS COMMUNITY EDITION TERMS__ という画面が出たら、__I confirm that I have read and accept the terms of this User Agreement__ にチェックを入れ、__[ Continue ]__ をクリックします。
+
+次に __DATA SHARING__ という画面が出たら、__[ Don't Send ]__ をクリックします。
+
+__Welcome to IntelliJ IDEA__ というウィンドウが出たら準備完了です。
+
+# プロジェクトを作る
+いよいよ IntelliJ IDEA を授業で使えるようにしていきます。
+まずは __New Project__ をクリックします。
+![スクリーンショット 2021-12-17 3.35.46.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/03cc185f-b638-6370-7a7c-eefc0cba0e29.png)
+
+__New Project__ というウィンドウが表示されるので、左側の一覧から __Java__ を選択し、画面上部の __Project SDK__ のプルダウンメニューから __Download JDK...__ という項目を選択します。
+![スクリーンショット 2021-12-17 3.37.29.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/c312923e-de3c-16d7-ae15-0bce935889e1.png)
+
+すると __Download JDK__ というウィンドウが表示されるので、項目の設定を
+
+- Version: 11
+- Vendor: Eclipse Temurin (AdoptOpenJDK HotSpot)
+- Location: C:\Users\admin\.jdks\temurin-11.0.13
+
+として、__[ Download ]__ をクリックし、JDK をダウンロードします。
+なお、Version については、貸与ノートパソコンに搭載の JRE のバージョンに合わせてください。
+![スクリーンショット 2021-12-17 3.40.25.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/458c67b4-ad27-a4f7-effe-96c33c8192eb.png)
+
+JDK のダウンロードが完了すると、__New Project__ ウィンドウに戻るので、画面上部の __Project SDK が　temurin-11 であることを確認して__、画面下部の __[ Next ]__ をクリックしてください。
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/dc2c9125-4f10-9946-2ed5-f015bca3ee81.png)
+
+次の画面では __チェックを入れずに [ Next ]__ をクリックしてください。
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/6fffb4d4-213c-7d4b-3345-34bb404d9382.png)
+
+最後にプロジェクト名とその場所を設定します。
+
+- Project name: j3 (授業で指定された Eclipse のプロジェクト名)
+- Project location: C:\Users\admin\IdeaProjects\j3 (お好みの場所)
+
+を指定して、__[ Finish ]__ をクリックしてください。
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/fa8db7ad-25e0-d9db-44b2-a0503acd857a.png)
+
+これでプロジェクトの作成は完了です。
+プロジェクト作成後に表示される __Tip of the Day__ ウィンドウについては __Close__ して構いません。
+
+
+# jUnit を導入する
+授業では __jUnit 4__ 及び __jUnit 5__ というテストツールを用いたテストを行いますので導入します。
+
+まずは画面左上の __File > Project Structure__ を選択します。
+![スクリーンショット 2021-12-17 4.01.28.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/6dee183e-8916-cd79-9214-db5f36597db2.png)
+
+ウィンドウが開いたら、一番左のリストから __Libraries__ を選択し、真ん中の空間の上部にある __[+]__ を選択します。
+![スクリーンショット 2021-12-20 21.58.15.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/813fd2f5-9ba1-4df0-2686-42be55bd5346.png)
+
+するとプルダウンメニューが表示されるので、__From Maven...__ を選択します。
+![スクリーンショット 2021-12-20 22.02.10.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/d70409a6-b18e-49af-97de-f3257644f3aa.png)
+
+__Download Library from Maven Repository__ というウィンドウが表示されるので、検索窓に`junit:junit:4.13.2`と入力して、ウィンドウ下部の __[OK]__ をクリックします。
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/852f0fc0-6d79-7e8e-edda-a50651353376.png)
+
+__Choose Modules__ というウィンドウが表示されるので、__j3__ を選択し、__[OK]__ をクリックします。
+これで jUnit 4 は導入できました。
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/9b250473-11d2-18dd-35a3-26db76822d8e.png)
+
+同様に __Download Library from Maven Repository__ ウィンドウで、検索窓に `org.junit.jupiter:junit-jupiter:5.4.2` と入力して、jUnit 5 を導入してください。
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/87fa3fba-8863-e46b-5b2d-80c5714e6213.png)
+
+最後に __Project Structure__ ウィンドウの下部にある、__[Apply]__, __[OK]__ を順にクリックします。
+![スクリーンショット 2021-12-20 22.18.03.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/13616a41-613f-1d85-0bc2-e8e598d7970a.png)
+
+
+# ローカルパッケージを導入する
+また、授業では指定の Processing パッケージなどを配布し、導入させる場合があります。その時のためにダウンロードしたローカルパッケージの導入方法についても解説します。
+
+まずは、ダウンロードした jar ファイルをプロジェクトフォルダに移動します。パッケージファイルを誤って移動させてしまうと正常に動かなくなるためです。
+[プロジェクトを作る](#プロジェクトを作る) の章で、Project location の場所を `C:\Users\admin\IdeaProjects\j3` としたならば、`C:\Users\admin\IdeaProjects\j3\src` にパッケージファイルを配置してください。
+
+__Project Structure__ を開き、__Libraries > [+]__ のように選択します。
+ここでプルダウンメニューが表示されるので、__Java__ を選択します。
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/7f28f3af-83e9-7eeb-bc38-1d03b0234a9a.png)
+
+__Select Library Files__ というウィンドウが表示されるので、__配置したフォルダを開き、インストールしたいパッケージを選択し__、ウィンドウ下部の __[OK]__ をクリックします。
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/ed971896-c4d4-4028-ac8c-dd0d88d3a071.png)
+
+__Choose Modules__ というウィンドウが表示されるので、__j3__ を選択し、__[OK]__ をクリックします。
+これで ローカルパッケージ を導入することができました。
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/9b250473-11d2-18dd-35a3-26db76822d8e.png)
+
+最後に __Project Structure__ ウィンドウの下部にある、__[Apply]__, __[OK]__ を順にクリックします。
+![スクリーンショット 2021-12-20 22.18.03.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/13616a41-613f-1d85-0bc2-e8e598d7970a.png)
+
+
+# パッケージ作成について
+__パッケージを作成したい親フォルダを右クリック__し、__New > Package__ の順にクリックします。
+![スクリーンショット 2021-12-20 22.35.54.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/5ec7d52c-5b6f-7937-9ce5-2f013b46c5e7.png)
+
+__Package Name__ というウィンドウが出るので、__任意の名前を入力し__、__Enter キー__を押します。
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/27636e8b-406e-ce70-78d8-51cc4082f089.png)
+
+パッケージを作成できました。
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/a3194883-381e-d9bf-ef22-0fe9ff0f2b51.png)
+
+
+# Zip ファイル書き出しについて
+Eclipse には、ファイルを Zip フォルダを書き出す機能がありますが、IntelliJ にはありません。よって、Windows の圧縮機能や 7-Zip を用いて作成する必要があります。
+
+構造としては、例えば `a.java, b.java, c.jpg を提出せよ。Zip フォルダの名前は 29k9999.zip とする`、という指示ならば、以下のような階層フォルダを持つ Zip フォルダを作成します。
+
+```
+29k9999.zip
+├── a.java
+├── b.java
+└── c.jpg
+```
+
+# さいごに
+これで Eclipse 運用だった Java の授業を IntelliJ に Migrate することができました。
+IntelliJ はプラグインなども多彩で、導入するだけでかなり授業を楽に受講できるのではないかと思います!
+では良い Java ライフを!!! 🎉
+
+

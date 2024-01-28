@@ -1,0 +1,220 @@
+---
+title: Hoppii の API を読んでみよう (Golang で API 叩くおまけつき)
+date: 2024-01-28
+tags: API, Go, AdventCalendar2022, hoppii, 法政大学, 情報科学部
+summary: Hoppii の API を読んでみよう (Golang で API 叩くおまけつき)の記事です。
+author: isso
+---
+
+# 注意!!!
+
+この記事は昔の [Qiita記事](https://qiita.com/isso_719/items/f3d1e8d7c186fd7b00c9) の移植です。
+記事の内容は2022年12月20日時点のもので、現在は古い情報が含まれている可能性があります。
+
+---
+
+「[法政大学情報科学部 Advent Calendar 2022](https://qiita.com/advent-calendar/2022/cis_hosei)」20 日目の記事になります。
+
+こんにちは、情報科学部の磯貝です。
+
+昨年度から同級生との雑談で始めた「[法政大学情報科学部 Advent Calendar 2022](https://qiita.com/advent-calendar/2022/cis_hosei)」ですが、同級生だけでなく、他学年や他学部の皆さんにも投稿していただいているということでめちゃくちゃな広がりを実感しています。
+今年度のカレンダーを立ててくれた [@HirokiLucky](https://qiita.com/HirokiLucky) と、昨年度の立ち上げと今年度の立ち上げの協力をしてくださった [@AbeTetsuya20](https://qiita.com/AbeTetsuya20) に感謝します。
+
+さて、今回は「Hoppii の API を読んでみよう」ということで、(案外知られていない?) 法政大学で使用されている学習支援システム Hoppii の API をちょっとだけ読んでいきたいと思います。
+
+# Hoppii について
+
+[Hoppii](https://hoppii.hosei.ac.jp/portal) は法政大学が提供する学習支援システムです。
+法大生なら多分毎日お世話になってるので、知らない人はいないはず…。
+
+そんな Hoppii は [Sakai Project](https://github.com/sakaiproject) の [Sakai](https://www.sakailms.org/) というオープンソースの Java(tomcat) で制作されたソフトウェアをベースに制作されています。(ソースコードは[こちら](https://github.com/sakaiproject/sakai), [コンフルに仕様書](https://sakaiproject.atlassian.net/wiki/spaces/CONF/overview?mode=global)もあるみたいです)
+
+Sakai には機能として REST API を提供しており、Sakai を使用している Hoppii にもその仕組みが存在します。
+今回はその Hoppii の [API Reference](https://hoppii.hosei.ac.jp/direct/describe) を読んでみてテキトーになんかやってみようって感じのやつです！
+
+# Hoppii の API Reference を読もう
+
+[こちら](https://hoppii.hosei.ac.jp/direct/describe)で Hoppii の API に関する説明を読むことができます。
+
+API は `announcement` や `assignment`、`content` など計 74 の Entity と呼ばれる機能でできているらしいです。
+
+今回は、上記で挙げた 3 つの Entity について、見ていこうと思います。
+
+※注意: これから Hoppii ユーザしか見れないので、ご了承ください…。Hoppii ユーザの方は一度統合認証ログインを行なってから以下の Entity を体験してみてください。
+
+## Accouncement Entity
+
+Hoppii の [Announcement Entity](https://hoppii.hosei.ac.jp/direct/announcement/describe) の説明を見てみます。公式の説明を引用すると、この Entity の説明は以下の通りです。
+
+```
+指定されたサイトに対するお知らせ (マージされたお知らせを含む) またはユーザに対するすべてのお知らせを表します．今日のメッセージおよび公開のお知らせも含みます．
+```
+
+つまり、Portal トップの「授業関連のお知らせ」欄などにあるお知らせを表示する Entity であることがわかります。
+
+[Announcement Entity](https://hoppii.hosei.ac.jp/direct/announcement/describe) の Custom Actions にある user アクションを試してみます。
+このアクションはユーザに送信されているお知らせを取得してくるものです。
+
+[https://hoppii.hosei.ac.jp/direct/announcement/user.json](https://hoppii.hosei.ac.jp/direct/announcement/user.json) にアクセスしてみましょう。
+Portal トップの「授業関連のお知らせ」欄にあるお知らせが表示されているはずです。
+
+## Assignment Entity
+
+次に [Assignment Entity](https://hoppii.hosei.ac.jp/direct/assignment/describe) を見てみましょう。
+
+Hoppii にある説明を引用すると以下のことが書いてありました。
+
+```
+課題:
+```
+
+めちゃくちゃわかりやすいですね笑
+課題に関する Entity らしいです。
+
+[Assignment Entity](https://hoppii.hosei.ac.jp/direct/assignment/describe) の Custom Actions にある my アクションを試してみます。
+このアクションはすべてのサイトのすべての課題を取得してくるものです。
+
+[https://hoppii.hosei.ac.jp/direct/assignment/my.json](https://hoppii.hosei.ac.jp/direct/assignment/my.json) にアクセスしてみましょう。
+これまで自分がやってきた課題 + 現在出されてる課題が表示されるはずです。
+
+## Content Entity
+
+次に [Content Entity](https://hoppii.hosei.ac.jp/direct/content/describe) を見てみましょう。
+
+Hoppii にある説明を引用すると以下のことが書いてありました。
+
+```
+コンテンツ/リソースツールを表示
+```
+
+授業ページの「教材」のようにコンテンツを並べるページがあると思うのですが、そういったリソースが列挙されているようなページのファイルのプロパティ(直リンクなど)を取得できるような Entity になっています。
+
+それでは、[Content Entity](https://hoppii.hosei.ac.jp/direct/content/describe) の Custom Actions にある site アクションを試してみます。
+このアクションは指定されたサイトのコンテンツアイテムを取得してくるものです。
+
+まずは、任意の授業のページにアクセスしましょう。
+URL の形式が `https://hoppii.hosei.ac.jp/portal/site/XXXXX` のようになっているはずです。
+この `XXXXX` は Hoppii API では SITEID と呼ばれます。
+
+それでは実際に API を試してみましょう。
+`https://hoppii.hosei.ac.jp/direct/content/site/SITEID.json` にアクセスしてみてください。
+「教材」欄にある教材のプロパティが取得できるはずです。
+
+特に `url` は面白く、教材の直リンクを見ることができます。プログラムを作成し、for 文などで回せば、WebDav クライアントを使用しなくても一括でファイルがダウンロードできるなど、面白い使い方がありそうですね！
+
+# Golang でライブラリを実装してみた
+
+法政大学情報科学部は日本の大学でも唯一 Golang が学べる場所として有名です。
+
+今回は `Accouncement Entity` の `user` アクションと、 `Assignment Entity` の `my` アクションを叩けるオープンソースのライブラリを実装してみました。
+
+なお API のソースコードは[こちら](https://github.com/isso-719/hoppii-api)にあります！(**サラッと書いてありますが、記事を書いている時間の 95% というかかなりの時間はここに時間を取られてます**)
+
+Golang なので、実装見やすいと思いますが、ただ各アクションの URL にアクセスしてるだけです(笑)
+機能もまだまだなので、これから暇があったら増やしていきたいと思います！
+Issue でのリクエストや Contribute も歓迎です！
+よろしくお願いいたします。
+
+# Hoppii API ライブラリを触ろう
+
+では、Golang を用いて僕の作った Hoppii API ライブラリを触ってみましょう。
+
+なお、Golang のバージョンは `1.19` を想定しています。
+Golang をインストールしたことない人は[こちら](https://www.youtube.com/watch?v=lu3_OqhLCmw)を参考に Golang 1.19 を導入すると良いです。(大学で Golang の講義してくださってる [tenntenn](https://tenntenn.dev/ja/) さんの動画です)
+
+ここからはターミナルを操作します。
+
+```bash
+# advent-hosei-2022 フォルダの作成
+mkdir advent-hosei-2022
+
+# go get で hoppii-api を取得
+go get github.com/isso-719/hoppii-api@v0.0.1
+```
+
+エディタなどで、`advent-hosei-2022` フォルダに下記の `main.go` ファイルを作成します。
+(学籍番号とパスワードの部分は各自変えてください)
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/isso-719/hoppii-api"
+	"github.com/isso-719/hoppii-api/pkg/announcement"
+	"github.com/isso-719/hoppii-api/pkg/assignment"
+	"github.com/isso-719/hoppii-api/pkg/user"
+)
+
+func main() {
+	// ここに学籍番号を入力
+	studentId := "99z9999"
+	// ここにパスワードを入力
+	password := "password"
+
+	hoppiiApi := hoppii_api.NewHoppiiApi()
+
+    // ユーザクライアントの作成 (これを使用して Hoppii にアクセスする)
+	user, err := hoppiiApi.User.CreateUser(&user.UserInput{
+		StudentId: studentId,
+		Password:  password,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+    // Announcement Entity の User Action を取得
+	auo, err := hoppiiApi.Announcement.User(&announcement.AnnouncementUserInput{
+		UserCookie: user.Cookie,
+	})
+	if err != nil {
+		panic(err)
+	}
+    // 結果を出力
+	fmt.Println(auo.AnnouncementUserResult.AnnouncementCollection[0].Title)
+
+    // Assignment Entity の My Action を取得
+	ao, err := hoppiiApi.Assignment.My(&assignment.AssignmentMyInput{
+		UserCookie: user.Cookie,
+	})
+	if err != nil {
+		panic(err)
+	}
+    // 結果を出力
+	fmt.Println(ao.AssignmentMyResult.AssignmentCollection[0].Title)
+}
+```
+
+あとはターミナルで依存関係を解決して…
+
+```bash
+# モジュールの依存関係の解決と整理を行う
+go mod tidy
+```
+
+準備完了です！
+
+それではターミナルでプログラムを走らせてみましょう。(インターネットアクセスを挟むため、環境によっては動作が遅いです)
+
+```bash
+% go run main.go
+Today's Class Canceled
+Quiz for week 2
+```
+
+僕の場合は上記のようなものが表示されました！！！
+最近のお知らせと、僕が最初にやった課題ですね(笑)
+
+これで、Golang で Hoppii の API を叩くことに成功しました！！！
+
+# 最後に
+
+今回は Hoppii API の紹介と、Golang で実際に叩くところまでやることができました。
+まだまだ奥が深い Hoppii…。この記事から、より Hoppii が使いやすくなることを願っています。
+
+今回ライブラリ実装にあたって、ログイン回りで結構つまづいたので、
+来年のアドベントカレンダーでは Hoppii の統合認証ログインを WebDriver を使わず、コードだけで突破してみるってのを紹介していきたいと思います！笑
+
+最後まで読んでいただきまして、ありがとうございました
+
+以上、「[法政大学情報科学部 Advent Calendar 2022](https://qiita.com/advent-calendar/2022/cis_hosei)」20 日目の記事でした。

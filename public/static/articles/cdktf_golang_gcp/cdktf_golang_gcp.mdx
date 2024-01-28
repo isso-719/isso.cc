@@ -1,0 +1,243 @@
+---
+title: CDK for Terraform with Golang で Google のリソース建ててみる
+date: 2024-01-28
+tags: CDKTF, Terraform, Go, googlecloud
+summary: CDK for Terraform with Golang で Google のリソース建ててみる記事です。
+author: isso
+---
+
+# 注意!!!
+
+この記事は昔の [Qiita記事](https://qiita.com/isso_719/items/b0124a08b28703e83b08) の移植です。
+記事の内容は2023年3月28日時点のもので、現在は古い情報が含まれている可能性があります。
+
+---
+
+# はじめに
+
+こんにちはいっそです!
+今回は CDK for Terraform with Golang で GCE のインスタンスを構築していこうと思います!
+
+# (CDK for Terraform を知る前に) Terraform とは
+
+- Terraform は IaC(Infrastructure as Code) の一種で、インフラ構成をコードとして管理できる機能を持つツールです。
+- GCP や AWS などのリソースを管理する (一括でリソースを構築したり、変更したり、削除する) ことができます。
+- コードベースなので、バージョン管理なども行うことができるのも利点です。
+
+詳しくは[こちら](https://developer.hashicorp.com/terraform/intro)
+
+# CDK for Terraform とは
+
+Terraform は独自の記法 (HCL, HashiCorp Configuration Language) を用いますが、 CDK for Terraform を用いることで Terraform のコードを TypeScript, Python, Java, C#, Golang から生成することができます。
+
+詳しくは[こちら](https://developer.hashicorp.com/terraform/cdktf)
+
+## 僕が思う CDKTF 良い点・悪い点
+
+- 良い点
+   - HCL を学習しなくて良く 、既存の言語の知識, スキルを使用可
+   - 使用するプログラミング言語の知識を活かせる
+   - 静的解析もしやすい
+    - IDE の補完や実行 (synth) 時にある程度テストしてくれる 
+    - コードの再利用性が高い
+    - インフラ知識が無い人でもコードを読めばどんなインフラ構成なのか理解がしやすい
+- 悪い点
+   - 比較的新しく、コミュニティや情報が少ない 、またバージョンアップがすごく早い 
+   - プロバイダーが言語のライブラリを提供している必要がある (TF より対応範囲が少ない)
+
+# 今回立てるリソース
+
+以下のようなリソースを建ててみます。
+
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/4fc7c253-4fc8-2699-7a02-38e3b3704b23.png)
+
+# インストール
+
+色々インストールします。
+
+## Terraform インストール
+
+macOS は [HomeBrew](https://formulae.brew.sh/formula/terraform), Win は [Scoop](https://scoop.sh/#/apps?s=0&d=1&o=false&q=Terraform) とかで入れられます。
+
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/4780e78b-60cf-ef27-3561-924ebcd7713d.png)
+
+## [gcloud CLI](https://cloud.google.com/sdk/docs/install?hl=ja) をインストール
+
+Terraform でリソースを操作するための API 有効化やアカウントの権限借用(つまりサービスアカウントの credentials ファイル不要です)などで使用します。
+
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/37f20733-347d-64c8-4af4-5b4b1e90919c.png)
+
+## [CDK for Terraform](https://developer.hashicorp.com/terraform/tutorials/cdktf/cdktf-install#install-cdktf) のインストール
+
+npm でインストールします。
+
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/daa2919f-396e-be92-b575-ab2eaeb8c10c.png)
+
+## プロジェクトの初期化
+
+空のフォルダで以下を実行します。
+
+- 今回は Golang を使用するため Golang の初期化テンプレートを要求します。
+- 今回はローカルで実行するようにします。(つまり普通であれば状態管理ファイル tfstate を S3 などに保存するところをローカルに保存するようにします)
+
+```bash:shell
+cdktf init --template=go --providers=hashicorp/google --local
+```
+色々聞かれるので、それぞれ適切なものを設定してください。
+
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/e16a7849-1b8e-afe2-d59d-7b9282fb4fd1.png)
+
+以下のようなファイルが作成されます。
+
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/ea0e61f6-5128-d30a-8040-cba02cdd4d00.png)
+
+# コードを書いていく
+
+生成された `main.go` の `NewMyStack` 関数に書いていきます。
+
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/394ad3da-a8c9-d465-ad72-fd1540c6b4b1.png)
+
+## プロバイダーの作成と API の有効化
+
+Google のリソースを管理するために Google Provider を定義します。Region には使用するリージョン、Project は使用するプロジェクト ID、Zone は使用するゾーンをそれぞれ適切に設定してください。
+また今回は GCE のリソースを建てるため、あらかじめ GCE の API を有効化しておきます。
+
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/537c5b18-25f1-314e-a0da-7cdc225d239f.png)
+
+## GCE のインスタンスを作成する
+
+先ほどの要件通りにリソースを定義します。
+
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/528213c4-9ba9-ec92-4645-2c44b9861360.png)
+
+## コードの全貌
+
+上記にコードを書いていくと、最終的に以下のようになります。
+
+```go:main.go
+package main
+
+import (
+	"github.com/aws/constructs-go/constructs/v10"
+	"github.com/aws/jsii-runtime-go"
+	"github.com/cdktf/cdktf-provider-google-go/google/v5/computeinstance"
+	"github.com/cdktf/cdktf-provider-google-go/google/v5/projectservice"
+	"github.com/cdktf/cdktf-provider-google-go/google/v5/provider"
+	"github.com/hashicorp/terraform-cdk-go/cdktf"
+)
+
+func NewMyStack(scope constructs.Construct, id string) cdktf.TerraformStack {
+	stack := cdktf.NewTerraformStack(scope, &id)
+
+	// Google Provider を作成する
+	provider.NewGoogleProvider(stack, jsii.String("google"), &provider.GoogleProviderConfig{
+		Region:  jsii.String("asia-northeast1"),
+		Project: jsii.String("rat-cdktf-test"), //  Your Google Project ID Here
+		Zone:    jsii.String("asia-northeast1-b"),
+	})
+
+	// API を有効にする
+	apis := map[string]string{
+		"ComputeEngine": "compute.googleapis.com",
+	}
+	for name, service := range apis {
+		projectservice.NewProjectService(stack, jsii.String(name), &projectservice.ProjectServiceConfig{
+			Service:                  jsii.String(service),
+			DisableDependentServices: jsii.Bool(true),
+		})
+	}
+
+	// GCE のインスタンスを作成する
+	computeinstance.NewComputeInstance(stack, jsii.String("test-instance"), &computeinstance.ComputeInstanceConfig{
+		Name:        jsii.String("test-instance"),
+		MachineType: jsii.String("e2-micro"),
+		Zone:        jsii.String("asia-northeast1-b"),
+		BootDisk: &computeinstance.ComputeInstanceBootDisk{
+			InitializeParams: &computeinstance.ComputeInstanceBootDiskInitializeParams{
+				// google_compute_image のリファレンスを参照して、image を指定する
+				Image: jsii.String("projects/debian-cloud/global/images/family/debian-11"),
+				Size:  jsii.Number(10),
+				Type:  jsii.String("pd-standard"),
+			},
+		},
+		NetworkInterface: &[]computeinstance.ComputeInstanceNetworkInterface{
+			{
+				Network: jsii.String("default"),
+			},
+		},
+	})
+
+	return stack
+}
+
+func main() {
+	app := cdktf.NewApp(nil)
+
+	NewMyStack(app, "test-cdktf-for-google")
+
+	app.Synth()
+}
+```
+
+# CDK for Terraform を実行してリソースを建てる。
+
+いよいよ CDK for Terraform を実行してリソースを建てます。
+
+```bash:shell
+# Google Project ID
+proj=your-google-cloud-project-id
+
+# gcloud コマンドを使用できるようにログイン
+gcloud auth login
+gcloud config set project ${proj}
+
+# CDKTF でサービスアカウントの権限を借用するためアプリケーションログイン
+gcloud auth application-default login
+
+# Terraform を実行するのに必要な Cloud Resource Manager API を有効にする
+gcloud services enable cloudresourcemanager.googleapis.com --project ${proj}
+
+# CDK for Terraform を実行してリソースを建てる
+cdktf deploy
+```
+
+リソースの差分が表示されて、本当にデプロイするか聞かれるので、`approve` します。
+
+以下のようになれば成功です。
+
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/44bb29d4-3990-32fb-30d8-9f71b6c71491.png)
+
+# 実際にインスタンス建ったの?
+
+実際にインスタンス建ってました！
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/fad85d4e-6462-920d-0dd3-c66c01f0a6ef.png)
+
+# Destroy する
+
+Terraform はリソースをコマンド 1 発で建てるだけでなく、破壊することもできます。
+
+```bash:shell
+cdktf destroy
+```
+以下のようになれば削除されています。
+
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/b2f745d5-060a-fca1-cf2e-cb588b5745b2.png)
+
+GCE の API も Terraform で有効化していたため GCE のページが API を有効化前の画面になりました...。
+
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/155e87e5-b56d-cd5a-6584-ada53c0547ee.png)
+
+# おまけ
+
+建てる予定のインスタンスのグローバルアドレスを変数に格納して、他の Provider と組み合わせて Cloudflare DNS に登録みたいなこともできます。
+
+![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/246409/a177ad4a-e970-511b-c707-46fe7b443c9f.png)
+
+# まとめ
+
+今回は CDK for Terraform と Google Provider を用いて、GCE のインスタンスを構築しました。
+Terraform もそうですが、コマンド 1 発でリソースが建つと、これまで人間が手作業でやってた部分が減り、間違えるリスクが低下したり、何より楽ですね！
+それに加えて CDKTF では Golang などのプログラミング言語で Terraform の機能が使えることで HCL 言語を覚える必要がなく、これまで SRE がやってたところをバックエンドエンジニアが行いやすくなるのも良かったと思います！
+
+ぜひ試してみてください！
+

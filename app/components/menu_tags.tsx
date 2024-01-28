@@ -15,7 +15,7 @@ const MenuTags = ({jsonPath, tagName}: { jsonPath: string, tagName?: string }) =
                 </a>
             </h3>
             <ul>
-                {Object.keys(tags).map((tag) => {
+                {Object.keys(tags).sort((a, b) => tags[b].count - tags[a].count).map((tag: any) => {
                     if (tagName && tagName === tag) {
                         return (
                             <li className="py-1" key={tag}>

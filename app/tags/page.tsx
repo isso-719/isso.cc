@@ -39,7 +39,7 @@ const Page = (params: any) => {
                         </h1>
                     </div>
                     <div className="flex max-w-lg flex-wrap">
-                        {Object.keys(tags).map((tag) => {
+                        {Object.keys(tags).sort((a, b) => tags[b].count - tags[a].count).map((tag: any) => {
                             return (
                                 <div className="mb-2 mr-5 mt-2" key={tag}>
                                     <a className="mr-3 text-sm font-medium uppercase text-pink-500 hover:text-pink-600 dark:hover:text-pink-400"
