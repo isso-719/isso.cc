@@ -8,7 +8,7 @@ gen-folders:
 
 .PHONY: gen-sitemap
 gen-sitemap:
-	@test -f public/sitemap.xml && rm public/sitemap.xml || true
+	@test -f public/sitemap.txt && rm public/sitemap.txt || true
 	@node ./scripts/gen_sitemap.mjs
 
 .PHONY: clean-blog
