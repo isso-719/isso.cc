@@ -1,11 +1,14 @@
 import nextMDX from "@next/mdx";
 import remarkGfm from "remark-gfm";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import remarkToc from "remark-toc";
 
 const withMDX = nextMDX({
   extensions: /\.mdx?$/,
   options: {
     remarkPlugins: [remarkGfm],
-    rehypePlugins: [],
+    rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
   },
 });
 
