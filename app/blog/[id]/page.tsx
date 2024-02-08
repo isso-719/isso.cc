@@ -63,7 +63,7 @@ const Page = ({params}: { params: { id: string } }) => {
                                     </div>
                                 </dl>
                                 <div>
-                                    <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl sm:leading-10 md:text-5xl md:leading-14 break-all">
+                                    <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl sm:leading-10 md:text-5xl md:leading-14 break-words">
                                         {title}
                                     </h1>
                                     <h2 className="py-4 leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:leading-10 md:leading-14 break-all">
