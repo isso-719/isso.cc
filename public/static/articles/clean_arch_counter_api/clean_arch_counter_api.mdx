@@ -1,0 +1,632 @@
+---
+title: カウンター API で学ぶ Clean Architecture
+date: 2024-02-05
+tags: Go, CleanArchitecture
+summary: カウンター API を作りながら Clean Architecture を学びます。
+author: isso
+---
+
+# はじめに
+
+こんにちは、isso です。
+
+今回は Clean Architecture について学ぶために、カウンターアプリを作りながら学んでいきます。(筆者独自の解釈が混ざってます、ご注意ください)
+
+記事で挙げているコードのレポジトリは [こちら](https://github.com/isso-719/counter-api) 。
+
+# Clean Architecture とは
+
+Clean Architecture は簡単にいうと、
+ビジネスロジック (そのアプリ独自の中心的な処理, つまりそのアプリが存在する意義) と、
+フレームワークやDBなどの外部のものを分離することで、
+ビジネスロジックを独立させ、変更しやすくするためのプログラム設計手法です。
+
+つまり、単純にわかりやすいプログラムやルールに則ったプログラムを設計する手法ではなく、
+責務を層に分けて分離することを目的にした設計手法なのです。
+
+その結果、
+プログラムが大きくなった際に、ビジネスロジックを変更することなく、
+フレームワークやDBなどの外部のものを変更することができるため、
+変更に強いプログラムを作ることができます。
+
+また、責務が分離しているので、プログラムがバグった時に、
+どこに問題があるのか、どこを変更すればいいのかがわかりやすくなります。
+
+さらに、新規の機能を実装しなければならない際に、
+再利用性が上がったり、
+既存の機能に影響を与えないように実装できたり、
+テストコードが書きやすくなったりします。
+
+Clean Architecture は結果的に、可読性、保守性、拡張性、テスト性が高いプログラムを作ることができるといった感じです。
+
+# カウンターアプリを作る
+
+それでは、実際にカウンターAPIを作りながら、Clean Architecture を学んでいきましょう。
+
+## プロジェクトの概要
+
+この API は本ブログの記事を見た人の人数を数えるためのものです。
+
+記事が見られた際に、その記事の URL を受け取り、
+URL に対応する記事のカウンターをインクリメントして、
+その記事のカウンターの値を返す API です。
+
+### エンドポイント
+
+- `GET /?url={URL}`
+  - パラメータに指定した URL に対応する記事のカウンターの値を返します。
+  - response:
+    ```json
+    {
+      "count": 100
+    }
+    ```
+
+## プロジェクトの使用技術
+
+本プロジェクトでは以下の技術を使用します。
+
+- Go (Echo)
+- Datastore モードの Firestore
+
+## プロジェクトのディレクトリ構成
+
+本プロジェクトでは以下のディレクトリ構成を採用します。(一部略)
+
+```text
+.
+├── cmd
+│ └── main.go
+└── src
+    ├── adapter
+    │ └── handler
+    │     └── counter.go
+    ├── domain
+    │ └── counter.go
+    ├── infra
+    │ ├── config
+    │ │ └── config.go
+    │ ├── datastore
+    │ │ ├── counter.go
+    │ │ └── datastore.go
+    │ └── router
+    │     └── router.go
+    ├── repository
+    │ └── counter.go
+    └── usecase
+        └── counter.go
+
+```
+
+## 各ディレクトリの役割
+
+- `cmd`: エントリーポイント (最初に実行されるファイル) を配置するディレクトリ
+- `src`: ソースコードを配置するディレクトリ
+  - `adapter/handler`: リクエストを受け取り、レスポンスを返すためのハンドラを配置するディレクトリ
+  - `domain`: ビジネスロジックのモデル (登場人物) だけを配置するディレクトリ
+  - `infra/config`: DB や Router の設定ファイルを配置するディレクトリ
+  - `infra/datastore`: Datastore にアクセスするための処理や repository で定義したインターフェースの具体的な実装を配置するディレクトリ
+  - `infra/router`: ルーティングを設定するための処理を配置するディレクトリ (Echo)
+  - `repository`: データベース操作用のインターフェースを配置するディレクトリ
+  - `usecase`: ビジネスロジックの処理の部分を配置するディレクトリ
+
+## プロジェクトの実装
+
+それでは、実際にプロジェクトを実装していきましょう。
+
+### ビジネスロジックのモデル
+
+まずは、ビジネスロジックのモデルを実装します。
+
+今回は URL と Count をまとめた Counter というモデルを実装します。
+
+```go
+// domain/counter.go
+
+package domain
+
+type Counter struct {
+	URL   string `json:"url"`
+	Count int64  `json:"count"`
+}
+```
+
+### データベース操作用のインターフェース
+
+次に、データベース操作用のインターフェースを実装します。
+
+データベース操作用のインターフェースは、データベース操作のためのメソッドを定義します。
+
+今回は Counter.Count の値をインクリメントするため、トランザクション、読み込み、書き込みのメソッドを定義します。
+
+```go
+// repository/counter.go
+
+package repository
+
+import (
+	"context"
+	"github.com/isso-719/counter-api/src/domain"
+)
+
+type IFCounterRepository interface {
+	BeginTx(ctx context.Context) error
+	CommitTx() error
+	TxRead(key string) (*domain.Counter, error)
+	TxWrite(key string, value *domain.Counter) (interface{}, error)
+}
+
+```
+
+### データベース操作用の具体的な実装
+
+次に、データベース操作用の具体的な実装を実装します。
+
+具体的な実装は、データベース操作用のインターフェースで定義したメソッドを実装します。
+
+```go
+// infra/datastore/counter.go
+
+package infra
+
+import (
+	"cloud.google.com/go/datastore"
+	"context"
+	"errors"
+	"github.com/isso-719/counter-api/src/domain"
+	"github.com/isso-719/counter-api/src/repository"
+)
+
+type counterRepository struct {
+	db *DB
+	tx *datastore.Transaction
+}
+
+func NewCounterRepository(client *DB) repository.IFCounterRepository {
+	return &counterRepository{
+		db: client,
+		tx: nil,
+	}
+}
+
+func (r *counterRepository) BeginTx(ctx context.Context) error {
+	tx, err := r.db.NewTransaction(ctx)
+	if err != nil {
+		return err
+	}
+	r.tx = tx
+	return nil
+}
+
+func (r *counterRepository) CommitTx() error {
+	if r.tx == nil {
+		return errors.New("no transaction started")
+	}
+	_, err := r.tx.Commit()
+	r.tx = nil
+	return err
+}
+
+func (r *counterRepository) TxRead(key string) (*domain.Counter, error) {
+	if r.tx == nil {
+		return nil, errors.New("no transaction started")
+	}
+
+	k := datastore.NameKey("Counter", key, nil)
+	count := &domain.Counter{}
+	err := r.tx.Get(k, count)
+	if errors.Is(err, datastore.ErrNoSuchEntity) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return count, nil
+}
+
+func (r *counterRepository) TxWrite(key string, value *domain.Counter) (interface{}, error) {
+	if r.tx == nil {
+		return nil, errors.New("no transaction started")
+	}
+
+	k := datastore.NameKey("Counter", key, nil)
+
+	_, err := r.tx.Put(k, value)
+	if err != nil {
+		return nil, err
+	}
+
+	return value, nil
+}
+```
+
+また、infra には Datastore のクライアントを作成する処理も実装します。
+
+```go
+// infra/datastore/datastore.go
+
+package infra
+
+import (
+	"cloud.google.com/go/datastore"
+	"context"
+	"github.com/isso-719/counter-api/src/infra/config"
+)
+
+type DB struct {
+	*datastore.Client
+}
+
+type TX struct {
+	*datastore.Transaction
+}
+
+func CreateDatastoreClient(ctx context.Context) (*DB, error) {
+	projectID := config.LoadDatastoreConfig().ProjectID
+
+	client, err := datastore.NewClient(ctx, projectID)
+	if err != nil {
+		panic(err)
+	}
+
+	return &DB{client}, nil
+}
+```
+
+### ビジネスロジックの処理
+
+次に、ビジネスロジックの処理を実装します。
+
+ビジネスロジックの処理は、ビジネスロジックのモデルを操作するための処理を実装します。
+
+今回は、URL に対応する記事のカウンターの値を取得する処理と、カウンターの値をインクリメントする処理を実装します。
+
+```go
+// usecase/counter.go
+
+package usecase
+
+import (
+	"context"
+	"errors"
+	"github.com/isso-719/counter-api/src/domain"
+	"github.com/isso-719/counter-api/src/repository"
+	"regexp"
+)
+
+type IFCounterService interface {
+	Increment(ctx context.Context, url string) (*domain.Counter, error)
+}
+
+type counterService struct {
+	counterRepository repository.IFCounterRepository
+}
+
+func NewCounterService(counterRepository repository.IFCounterRepository) IFCounterService {
+	return &counterService{
+		counterRepository: counterRepository,
+	}
+}
+
+func (c *counterService) Increment(ctx context.Context, url string) (*domain.Counter, error) {
+	if url == "" {
+		return nil, errors.New("url is required")
+	}
+	r := regexp.MustCompile(`^(http|https)://[a-zA-Z0-9-_.]+.[a-zA-Z0-9-.]+$`)
+	if !r.MatchString(url) {
+		return nil, errors.New("url is invalid")
+	}
+
+	err := c.counterRepository.BeginTx(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer c.counterRepository.CommitTx()
+
+	count, err := c.counterRepository.TxRead(url)
+	if err != nil {
+		return nil, err
+	}
+	if count == nil {
+		count = &domain.Counter{
+			URL:   url,
+			Count: 0,
+		}
+	}
+
+	count.Count++
+
+	_, err = c.counterRepository.TxWrite(url, count)
+	if err != nil {
+		return nil, err
+	}
+
+	return count, nil
+}
+```
+
+### ハンドラの実装
+
+次に、リクエストを受け取り、レスポンスを返すためのハンドラを実装します。
+
+ハンドラは、リクエストを受け取り、ビジネスロジックの処理を呼び出し、レスポンスを返します。
+
+```go
+// adapter/handler/counter.go
+
+package handler
+
+import (
+	"context"
+	"github.com/isso-719/counter-api/src/domain"
+	"github.com/isso-719/counter-api/src/usecase"
+	"github.com/labstack/echo/v4"
+)
+
+type IFCounterHandler interface {
+	IncrementCounter(ctx context.Context) echo.HandlerFunc
+}
+
+type CounterHandler struct {
+	counterService usecase.IFCounterService
+}
+
+func NewCounterHandler(counterService usecase.IFCounterService) IFCounterHandler {
+	return &CounterHandler{
+		counterService: counterService,
+	}
+}
+
+type IncrementCounterRequest struct {
+	URL string `json:"url"`
+}
+
+type IncrementCounterResponse struct {
+	Counter domain.Counter `json:"counter"`
+}
+
+type IncrementCounterErrorResponse struct {
+	Error string `json:"error"`
+}
+
+func (c *CounterHandler) IncrementCounter(ctx context.Context) echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		var req IncrementCounterRequest
+		if err := ctx.Bind(&req); err != nil {
+			return ctx.JSON(400, IncrementCounterErrorResponse{
+				Error: err.Error(),
+			})
+		}
+
+		url := ctx.QueryParam("url")
+		count, err := c.counterService.Increment(ctx.Request().Context(), url)
+		if err != nil {
+			return ctx.JSON(400, IncrementCounterErrorResponse{
+				Error: err.Error(),
+			})
+		}
+
+		return ctx.JSON(200, IncrementCounterResponse{
+			Counter: *count,
+		})
+	}
+}
+```
+
+### ルーターの設定
+
+次に、ルーターの設定を実装します。
+
+ルーターの設定は、リクエストのエンドポイントとハンドラを紐付ける処理を実装します。
+
+```go
+// infra/router/router.go
+
+package router
+
+import (
+	"context"
+	"github.com/isso-719/counter-api/src/adapter/handler"
+	"github.com/isso-719/counter-api/src/infra/infra"
+	"github.com/isso-719/counter-api/src/usecase"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+)
+
+func InitRouter(ctx context.Context) *echo.Echo {
+	e := echo.New()
+	e.Use(
+		middleware.Logger(),
+		middleware.Recover(),
+		middleware.CORS(),
+	)
+
+	// init Datastore
+	db, err := infra.CreateDatastoreClient(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	// routes
+	counterRepository := infra.NewCounterRepository(db)
+	counterService := usecase.NewCounterService(counterRepository)
+	counterHandler := handler.NewCounterHandler(counterService)
+
+	e.GET("/", counterHandler.IncrementCounter(ctx))
+
+	return e
+}
+```
+
+### その他諸々
+
+その他、DB の設定ファイルやエントリーポイントなどを実装します。
+
+config.go では .env や環境変数から Datastore やサーバの Host, Port を読み込む処理を実装します。
+
+```go
+// infra/config/config.go
+
+package config
+
+import (
+	"github.com/joho/godotenv"
+	"github.com/labstack/gommon/log"
+	"os"
+)
+
+func init() {
+	loadDotEnv()
+}
+
+func loadDotEnv() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Warn("Error loading .env file")
+	}
+}
+
+type HTTPConfig struct {
+	Host string
+	Port string
+}
+
+func LoadHTTPConfig() *HTTPConfig {
+	host, ok := os.LookupEnv("HOST")
+	if !ok {
+		panic("Cannot find ENV: HOST")
+	}
+	port, ok := os.LookupEnv("PORT")
+	if !ok {
+		panic("Cannot find ENV: PORT")
+	}
+
+	return &HTTPConfig{
+		Host: host,
+		Port: port,
+	}
+}
+
+type DatastoreConfig struct {
+	ProjectID string
+}
+
+func LoadDatastoreConfig() *DatastoreConfig {
+	projectID, ok := os.LookupEnv("GOOGLE_PROJECT_ID")
+	if !ok {
+		panic("Cannot find ENV: PROJECT_ID")
+	}
+	return &DatastoreConfig{
+		ProjectID: projectID,
+	}
+}
+```
+
+main.go ではサーバを起動する処理を実装します。
+
+```go
+// cmd/main.go
+
+package main
+
+import (
+	"context"
+	"fmt"
+	"github.com/isso-719/counter-api/src/infra/config"
+	"github.com/isso-719/counter-api/src/infra/router"
+	"log"
+	"net/http"
+	"os/signal"
+	"syscall"
+	"time"
+)
+
+func main() {
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+
+	httpConfig := config.LoadHTTPConfig()
+
+	router := router.InitRouter(ctx)
+	addr := httpConfig.Host + ":" + httpConfig.Port
+	srv := &http.Server{
+		Addr:           addr,
+		Handler:        router,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
+
+	go func() {
+		fmt.Println("Server started at " + addr)
+		if err := srv.ListenAndServe(); err != nil {
+			log.Fatal("Server failed to start: ", err)
+		}
+	}()
+	<-ctx.Done()
+	stop()
+	log.Println("shutting down gracefully, press Ctrl+C again to force")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server forced to shutdown: ", err)
+	}
+
+	log.Println("Server exiting")
+}
+```
+
+# Clean Arch Points
+
+ここで、2 つのポイントを挙げます。
+
+## 技術仕様を変更したい時でも簡単に (例: データベース)
+
+最初、 Clean Architecture は、責務を層に分けて分離することを目的にした設計手法で、
+ビジネスロジックを変更することなく、フレームワークやDBなどの外部のものを変更することができると述べました。
+
+ここで実装したファイルを見てみると、
+Datastore のパッケージ (cloud.google.com/go/datastore) は、
+infra 層以外からは参照されていません。
+
+つまり、データベースを Datastore から別のデータベース (例えば MySQL) に変更したい場合、
+infra 層の中だけを変えることにより、
+ビジネスロジックの変更を行わずにデータベースを変更することができます。
+
+これが Clean Architecture の強みの 1 つなのです。
+
+## テストも書きやすい
+
+ロジックは全て usecase 層に集約されているため、
+usecase 層のロジックをテストすることで、
+ビジネスロジックのテストを行うことができます。
+
+また、usecase 層からは repository 層のインターフェースを呼び出しているため、
+GoMock でのモックを作成することも容易に行えます。
+
+```go
+// repository/counter.go
+
+package repository
+
+//go:generate mockgen -source=counter.go -destination=counter_mock.go -package=repository
+
+... 略 ...
+```
+
+# まとめ
+
+Clean Architecture について学びながら、カウンターアプリを作りました。
+
+Clean Architecture は、その形式を守ることや、わかりやすいコードを作ることが目的ではなく、
+ビジネスロジックを独立させ、変更しやすくするためのプログラム設計手法で、
+結果的にわかりやすいコードを作ることができるということがわかりました。
+
+また、Clean Architecture は、ビジネスロジックを変更することなく、
+フレームワークやDBなどの外部のものを変更することができるため、
+変更に強いプログラムを作ることができることもわかりました。
+
+そして、Clean Architecture は、ビジネスロジックのテストを行いやすくするため、
+テストコードを書きやすいということもわかりました。

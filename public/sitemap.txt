@@ -5,6 +5,7 @@ https://isso.cc/about
 https://isso.cc/blog/buy_miku_keyboard_with_sofmap
 https://isso.cc/blog/ca_tech_job
 https://isso.cc/blog/cdktf_golang_gcp
+https://isso.cc/blog/clean_arch_counter_api
 https://isso.cc/blog/conoha_with_dokku
 https://isso.cc/blog/docker_postgres_open_port_issue
 https://isso.cc/blog/fix_parallels_desktop_time
@@ -29,6 +30,7 @@ https://isso.cc/tags/CDKTF
 https://isso.cc/tags/Terraform
 https://isso.cc/tags/Go
 https://isso.cc/tags/googlecloud
+https://isso.cc/tags/CleanArchitecture
 https://isso.cc/tags/ConoHa
 https://isso.cc/tags/dokku
 https://isso.cc/tags/PaaS
