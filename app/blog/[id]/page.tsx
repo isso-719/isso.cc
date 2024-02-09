@@ -12,7 +12,7 @@ async function getViews(id: string) {
     let count = 0;
     try {
         const response = await fetch(
-            `https://counter-api-frggvkrr3q-an.a.run.app/?url=https://isso.cc/blog/${id}`,
+            `https://counter-api.isso.app/?url=https://isso.cc/blog/${id}`,
             {
                 method: 'GET',
                 cache: 'no-cache',
