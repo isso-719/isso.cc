@@ -8,7 +8,29 @@ export const metadata: Metadata = {
     metadataBase: new URL('https://isso.cc'),
 }
 
-const Page = ({params}: { params: { id: string } }) => {
+async function getViews(id: string) {
+    let count = 0;
+    try {
+        const response = await fetch(
+            `https://counter-api-frggvkrr3q-an.a.run.app/?url=https://isso.cc/blog/${id}`,
+            {
+                method: 'GET',
+                cache: 'no-cache',
+            }
+        );
+
+        const data = await response.json();
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        count = data.counter.count;
+    } catch (error) {
+        console.error('Error:', error);
+    }
+    return count;
+}
+
+const Page = async ({params}: { params: { id: string } }) => {
     let article;
     // mdxファイルを読み込む
     try {
@@ -27,7 +49,7 @@ const Page = ({params}: { params: { id: string } }) => {
     const summary = articleMeta[4].replace("summary: ", "");
     const author = articleMeta[5].replace("author: ", "");
     const content = article.split("\n").slice(7).join("\n");
-    
+
     metadata.title = `${title} | ISSO BLOG`;
     metadata.description = summary;
     metadata.openGraph = {
@@ -46,6 +68,8 @@ const Page = ({params}: { params: { id: string } }) => {
         site: "@isso_app",
         images: '/opengraph-image.jpeg',
     }
+    const count = await getViews(params.id);
+
 
     return (
         <div className="h-full">
@@ -69,6 +93,10 @@ const Page = ({params}: { params: { id: string } }) => {
                                     <h2 className="py-4 leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:leading-10 md:leading-14 break-all">
                                         {author}
                                     </h2>
+                                    <div
+                                        className="py-4 leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:leading-10 md:leading-14 break-all">
+                                        <p>{count} views</p>
+                                    </div>
                                 </div>
                             </div>
                         </header>
