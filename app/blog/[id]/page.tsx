@@ -15,7 +15,6 @@ async function getViews(id: string) {
             `https://counter-api.isso.app/?url=https://isso.cc/blog/${id}`,
             {
                 method: 'GET',
-                cache: 'no-cache',
             }
         );
 
