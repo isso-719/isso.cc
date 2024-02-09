@@ -17,6 +17,7 @@ https://isso.cc/blog/ruby_faye_websocket
 https://isso.cc/blog/ruby_postgres_local_vol1
 https://isso.cc/blog/ruby_postgres_local_vol2
 https://isso.cc/blog/ruby_postgres_local_vol3
+https://isso.cc/blog/test_bsky_api_go
 https://isso.cc/tags/trivia
 https://isso.cc/tags/money
 https://isso.cc/tags/game
@@ -60,3 +61,4 @@ https://isso.cc/tags/WebSocket
 https://isso.cc/tags/Gem
 https://isso.cc/tags/brew
 https://isso.cc/tags/Scoop
+https://isso.cc/tags/Bluesky
