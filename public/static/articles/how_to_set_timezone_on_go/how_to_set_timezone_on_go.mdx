@@ -1,0 +1,33 @@
+---
+title: Go で日本時間に設定する方法 (メモ)
+date: 2024-02-17
+tags: Go
+summary: Go で日本時間に設定する方法に関するメモです。
+author: isso
+---
+
+# Go で日本時間に設定する方法 (メモ)
+
+time パッケージが保持しているグローバル変数 time.Local を JST で更新する。
+
+この変数を変更することで、Time.Now() などの関数が返す値がJSTになる。
+
+```go
+jst, err := time.LoadLocation("Asia/Tokyo")
+if err != nil {
+  panic(err)
+}
+time.Local = jst
+```
+
+ただし、単純実装に限る。業務などで使う場合は func (t Time) In(loc *Location) Time などを使うことが推奨される。
+
+```go
+jst, err := time.LoadLocation("Asia/Tokyo")
+if err != nil {
+  panic(err)
+}
+
+t := time.Now()
+jstTime := t.In(jst)
+```
