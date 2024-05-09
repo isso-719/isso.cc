@@ -183,6 +183,16 @@ const Page = () => {
                 <h2 className="pb-8 text-4xl font-bold text-center sm:text-left">Award</h2>
                 <ul className="list-none">
                     <li className="m-0.5 text-center sm:text-left">
+                        <b>情報科学部賞: 法政大学 情報科学部 (2024)</b>
+                    </li>
+                    <li className="m-0.5 text-center sm:text-left">
+                        <b>
+                            <a href="https://www.ipsj.or.jp/event/taikai/86/WEB/data/pdf/5Y-08.html" target="_blank" rel="noreferrer">
+                                情報処理学会 第 86 回全国大会 学生奨励賞 (2024)
+                            </a>
+                        </b>
+                    </li>
+                    <li className="m-0.5 text-center sm:text-left">
                         <b>ハイスキルテクノロジーアワード: 株式会社ライフイズテックメンターアワード (2022)</b>
                     </li>
                     <li className="m-0.5 text-center sm:text-left">
@@ -206,7 +216,7 @@ const Page = () => {
                 <h2 className="pb-8 text-4xl font-bold text-center sm:text-left">Publication</h2>
                 <ul className="list-none">
                     <li className="m-0.5 text-center sm:text-left">
-                        磯貝和希，藤田悟. <br/>複数画面インタラクティブデジタルサイネージシステムの構築.<br/>情報処理学会 第 86 回全国大会，5Y-08，2024.
+                        磯貝和希 (法政大学)，藤田悟 (法政大学). <br/>複数画面インタラクティブデジタルサイネージシステムの構築.<br/>情報処理学会 第86回全国大会論文誌，5Y-08，2024.
                     </li>
                 </ul>
             </div>
