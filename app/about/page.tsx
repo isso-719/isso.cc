@@ -188,7 +188,7 @@ const Page = () => {
                     <li className="m-0.5 text-center sm:text-left">
                         <b>
                             <a href="https://www.ipsj.or.jp/event/taikai/86/WEB/data/pdf/5Y-08.html" target="_blank" rel="noreferrer">
-                                情報処理学会 第 86 回全国大会 学生奨励賞 (2024)
+                                学生奨励賞: 情報処理学会 第 86 回全国大会 (2024)
                             </a>
                         </b>
                     </li>
