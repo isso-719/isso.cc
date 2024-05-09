@@ -12,6 +12,7 @@ https://isso.cc/blog/hello_world
 https://isso.cc/blog/hoppii_api_go
 https://isso.cc/blog/how_to_set_timezone_on_go
 https://isso.cc/blog/intellij_java
+https://isso.cc/blog/ipsj86
 https://isso.cc/blog/latex_overleaf
 https://isso.cc/blog/ruby_faye_websocket
 https://isso.cc/blog/ruby_postgres_local_vol1
@@ -51,6 +52,7 @@ https://isso.cc/tags/情報科学部
 https://isso.cc/tags/Java
 https://isso.cc/tags/IntelliJ
 https://isso.cc/tags/IntelliJIdea
+https://isso.cc/tags/情報処理学会
 https://isso.cc/tags/LaTeX
 https://isso.cc/tags/Overleaf
 https://isso.cc/tags/Sinatra

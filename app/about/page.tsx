@@ -38,6 +38,10 @@ const Page = () => {
                           className="text-base font-medium leading-6 text-pink-500 hover:text-pink-600 dark:hover:text-pink-400">
                         Twitter
                     </a>
+                    <a href="https://github.com/isso-719" target="_blank" rel="noreferrer"
+                            className="text-base font-medium leading-6 text-pink-500 hover:text-pink-600 dark:hover:text-pink-400 ml-4">
+                        GitHub
+                    </a>
                 </div>
             </div>
             <div id="about-me" className="pb-36">
@@ -148,54 +152,74 @@ const Page = () => {
                 </p>
             </div>
             <div id="works" className="pb-36">
-                <h2 className="pb-2 text-4xl font-bold text-center sm:text-left">Work</h2>
-                <p className="pb-8">
-                    See more on <a href="https://isogai.notion.site/ec8f390467934e29a7dc7da0c28180fd" target="_blank" rel="noreferrer"
-                        className="text-base font-medium leading-6 text-pink-500 hover:text-pink-600 dark:hover:text-pink-400">
-                        My Notion
-                    </a> and <a href="https://github.com/isso-719" target="_blank" rel="noreferrer"
-                        className="text-base font-medium leading-6 text-pink-500 hover:text-pink-600 dark:hover:text-pink-400">
-                        GitHub
-                    </a>.
-                </p>
+                <h2 className="pb-8 text-4xl font-bold text-center sm:text-left">Work</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                     <div className="w-full px-0 pb-4">
-                        <div className="flex justify-center items-center w-full max-w-[496px] h-[300px] bg-black font-bold text-white text-2xl">
+                        <div className="flex justify-center items-center w-full max-w-[496px] font-bold text-white text-2xl">
                             <a href="https://isogai.notion.site/GayaON-5ad2fcdd75ac4eecac09d62cd6562562" target="_blank" rel="noreferrer">
-                                <img className="w-full hover:opacity-80 transition-opacity"
-                                     src="/static/assets/images/gaya-on.svg"
-                                     alt="Gaya On!"/>
+                                <div className="relative w-full h-full">
+                                    <img className="w-full hover:opacity-80 transition-opacity"
+                                            src="/static/assets/images/gaya-on.svg"
+                                            alt="GayaON"/>
+                                    <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity">
+                                        <p className="text-white text-lg font-bold">GayaON!</p>
+                                    </div>
+                                </div>
                             </a>
                         </div>
                     </div>
                     <div className="w-full px-0 pb-4">
-                        <div className="flex justify-center items-center w-full max-w-[496px] h-[300px] bg-black font-bold text-white text-2xl">
+                        <div className="flex justify-center items-center w-full max-w-[496px] font-bold text-white text-2xl">
                             <a href="https://isogai.notion.site/Keypod-0ca847b1d9d54fb0a48c07828bdd31b5" target="_blank" rel="noreferrer">
-                                <img className="w-full hover:opacity-80 transition-opacity"
-                                     src="/static/assets/images/keypod.svg"
-                                     alt="KeyPod"/>
+                                <div className="relative w-full h-full">
+                                    <img className="w-full hover:opacity-80 transition-opacity"
+                                         src="/static/assets/images/keypod.svg"
+                                         alt="KeyPod"/>
+                                    <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity">
+                                        <p className="text-white text-lg font-bold">Keypod</p>
+                                    </div>
+                                </div>
                             </a>
                         </div>
                     </div>
                     <div className="w-full px-0 pb-4">
-                        <div className="flex justify-center items-center w-full max-w-[496px] h-[300px] bg-black font-bold text-white text-2xl">
+                        <div className="flex justify-center items-center w-full max-w-[496px] font-bold text-white text-2xl">
                             <a href="https://isogai.notion.site/Pomod-co-d87c0935545c486592c6f26f39dcf6ce" target="_blank" rel="noreferrer">
-                                <img className="w-full hover:opacity-80 transition-opacity"
-                                     src="/static/assets/images/pomodco.svg"
-                                     alt="Pomodco"/>
+                                <div className="relative w-full h-full">
+                                    <img className="w-full hover:opacity-80 transition-opacity"
+                                         src="/static/assets/images/pomodco.svg"
+                                         alt="Pomodco"/>
+                                    <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity">
+                                        <p className="text-white text-lg font-bold">Pomod.co</p>
+                                    </div>
+                                </div>
                             </a>
                         </div>
                     </div>
                     <div className="w-full px-0 pb-4">
-                        <div className="flex justify-center items-center w-full max-w-[496px] h-[300px] bg-black font-bold text-white text-2xl">
+                        <div className="flex justify-center items-center w-full max-w-[496px] font-bold text-white text-2xl">
                             <a href="https://isogai.notion.site/BOT-8daf568712aa4e34bf3f9ef3eecedc74" target="_blank" rel="noreferrer">
-                            <img className="w-full hover:opacity-80 transition-opacity"
-                                 src="/static/assets/images/asakatsu.svg"
-                                 alt="Asakatsu BOT"/>
+                                <div className="relative w-full h-full">
+                                    <img className="w-full hover:opacity-80 transition-opacity"
+                                         src="/static/assets/images/asakatsu.svg"
+                                         alt="Asakatsu BOT"/>
+                                    <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity">
+                                        <p className="text-white text-lg font-bold">朝活 BOT</p>
+                                    </div>
+                                </div>
                             </a>
                         </div>
                     </div>
                 </div>
+                <p className="pt-8 text-2xl font-bold text-center sm:text-left">
+                    See more on my <a href="https://isogai.notion.site/ec8f390467934e29a7dc7da0c28180fd" target="_blank" rel="noreferrer"
+                                      className="text-2xl font-bold text-pink-500 hover:text-pink-600 dark:hover:text-pink-400">
+                    Notion
+                </a> and <a href="https://github.com/isso-719" target="_blank" rel="noreferrer"
+                            className="text-2xl font-bold text-pink-500 hover:text-pink-600 dark:hover:text-pink-400">
+                    GitHub
+                </a>.
+                </p>
             </div>
             <div id="skill" className="pb-36">
                 <h2 className="pb-8 text-4xl font-bold text-center sm:text-left">Skill</h2>
