@@ -33,6 +33,12 @@ const Page = () => {
                 <p className="mt-6 text-lg text-center text-gray-500 dark:text-gray-400">
                     a.k.a. isso
                 </p>
+                <div className="flex justify-center mt-8">
+                    <a href="https://twitter.com/isso_app" target="_blank" rel="noreferrer"
+                          className="text-base font-medium leading-6 text-pink-500 hover:text-pink-600 dark:hover:text-pink-400">
+                        Twitter
+                    </a>
+                </div>
             </div>
             <div id="about-me" className="pb-36">
                 <div className="flex justify-between flex-col sm:flex-row items-center sm:items-start">
@@ -81,18 +87,22 @@ const Page = () => {
                     </li>
                     <li className="mb-10 ms-4">
                         <div className="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>
-                        <p className="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">April 2020 - B.S. expected March 2024</p>
+                        <p className="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">April 2020 - March 2024</p>
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">法政大学</h3>
                         <p className="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">
                             情報科学部コンピュータ科学科 ISコース<br />
                             サービスシステム研究室 (藤田研)<br />
-                            Research theme: 複数画面インタラクティブデジタルサイネージシステム
+                            Research theme: 複数画面インタラクティブデジタルサイネージシステム<br />
+                            理学学士 (情報科学)
                         </p>
                     </li>
                 </ol>
             </div>
             <div id="jobs" className="pb-36">
-                <h2 className="pb-8 text-4xl font-bold text-center sm:text-left">Job Experience</h2>
+                <h2 className="pb-2 text-4xl font-bold text-center sm:text-left">Job Experience</h2>
+                <p className="mb-8 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">
+                    Show Long-term Internship and Part-time Job
+                </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                     <div className="w-full px-0 pb-4">
                         <h3 className="text-center sm:text-left text-lg font-semibold text-gray-900 dark:text-white">ライフイズテック株式会社</h3>
@@ -138,26 +148,51 @@ const Page = () => {
                 </p>
             </div>
             <div id="works" className="pb-36">
-                <h2 className="pb-8 text-4xl font-bold text-center sm:text-left">Work</h2>
+                <h2 className="pb-2 text-4xl font-bold text-center sm:text-left">Work</h2>
+                <p className="pb-8">
+                    See more on <a href="https://isogai.notion.site/ec8f390467934e29a7dc7da0c28180fd" target="_blank" rel="noreferrer"
+                        className="text-base font-medium leading-6 text-pink-500 hover:text-pink-600 dark:hover:text-pink-400">
+                        My Notion
+                    </a> and <a href="https://github.com/isso-719" target="_blank" rel="noreferrer"
+                        className="text-base font-medium leading-6 text-pink-500 hover:text-pink-600 dark:hover:text-pink-400">
+                        GitHub
+                    </a>.
+                </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                     <div className="w-full px-0 pb-4">
                         <div className="flex justify-center items-center w-full max-w-[496px] h-[300px] bg-black font-bold text-white text-2xl">
-                            Coming Soon
+                            <a href="https://isogai.notion.site/GayaON-5ad2fcdd75ac4eecac09d62cd6562562" target="_blank" rel="noreferrer">
+                                <img className="w-full hover:opacity-80 transition-opacity"
+                                     src="/static/assets/images/gaya-on.svg"
+                                     alt="Gaya On!"/>
+                            </a>
                         </div>
                     </div>
                     <div className="w-full px-0 pb-4">
                         <div className="flex justify-center items-center w-full max-w-[496px] h-[300px] bg-black font-bold text-white text-2xl">
-                            Coming Soon
+                            <a href="https://isogai.notion.site/Keypod-0ca847b1d9d54fb0a48c07828bdd31b5" target="_blank" rel="noreferrer">
+                                <img className="w-full hover:opacity-80 transition-opacity"
+                                     src="/static/assets/images/keypod.svg"
+                                     alt="KeyPod"/>
+                            </a>
                         </div>
                     </div>
                     <div className="w-full px-0 pb-4">
                         <div className="flex justify-center items-center w-full max-w-[496px] h-[300px] bg-black font-bold text-white text-2xl">
-                            Coming Soon
+                            <a href="https://isogai.notion.site/Pomod-co-d87c0935545c486592c6f26f39dcf6ce" target="_blank" rel="noreferrer">
+                                <img className="w-full hover:opacity-80 transition-opacity"
+                                     src="/static/assets/images/pomodco.svg"
+                                     alt="Pomodco"/>
+                            </a>
                         </div>
                     </div>
                     <div className="w-full px-0 pb-4">
                         <div className="flex justify-center items-center w-full max-w-[496px] h-[300px] bg-black font-bold text-white text-2xl">
-                            Coming Soon
+                            <a href="https://isogai.notion.site/BOT-8daf568712aa4e34bf3f9ef3eecedc74" target="_blank" rel="noreferrer">
+                            <img className="w-full hover:opacity-80 transition-opacity"
+                                 src="/static/assets/images/asakatsu.svg"
+                                 alt="Asakatsu BOT"/>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -216,7 +251,7 @@ const Page = () => {
                 <h2 className="pb-8 text-4xl font-bold text-center sm:text-left">Publication</h2>
                 <ul className="list-none">
                     <li className="m-0.5 text-center sm:text-left">
-                        磯貝和希 (法政大学)，藤田悟 (法政大学). <br/>複数画面インタラクティブデジタルサイネージシステムの構築.<br/>情報処理学会 第86回全国大会論文誌，5Y-08，2024.
+                        磯貝和希 (法政大学)，藤田悟 (法政大学). <br/>複数画面インタラクティブデジタルサイネージシステムの構築.<br/>情報処理学会 第86回全国大会 講演論文集，5Y-08，2024.
                     </li>
                 </ul>
             </div>
