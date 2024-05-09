@@ -124,7 +124,7 @@ const Page = () => {
                         </p>
                     </div>
                     <div className="w-full px-0 pb-4">
-                        <h3 className="text-center sm:text-left text-lg font-semibold text-gray-900 dark:text-white">株式会社Stack</h3>
+                        <h3 className="text-center sm:text-left text-lg font-semibold text-gray-900 dark:text-white">株式会社Stack (株式会社 Appify Technologies)</h3>
                         <p className="text-center sm:text-left mb-4 text-base font-normal text-gray-500 dark:text-gray-400">
                             April 2022 - August 2023
                         </p>
