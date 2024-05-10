@@ -109,6 +109,18 @@ const Page = () => {
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                     <div className="w-full px-0 pb-4">
+                        <h3 className="text-center sm:text-left text-lg font-semibold text-gray-900 dark:text-white">合同会社 DMM.com</h3>
+                        <p className="text-center sm:text-left mb-4 text-base font-normal text-gray-500 dark:text-gray-400">
+                            April 2024 - Present
+                        </p>
+                        <p className="text-center sm:text-left mb-4 text-base font-normal text-gray-500 dark:text-gray-400">
+                            新卒入社した。
+                        </p>
+                    </div>
+                    <div className="w-full px-0 pb-4">
+                        {/*  this is empty section.  */}
+                    </div>
+                    <div className="w-full px-0 pb-4">
                         <h3 className="text-center sm:text-left text-lg font-semibold text-gray-900 dark:text-white">ライフイズテック株式会社</h3>
                         <p className="text-center sm:text-left mb-4 text-base font-normal text-gray-500 dark:text-gray-400">
                             June 2020 - June 2023
