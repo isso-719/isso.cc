@@ -105,7 +105,7 @@ const Page = () => {
             <div id="jobs" className="pb-36">
                 <h2 className="pb-2 text-4xl font-bold text-center sm:text-left">Job Experience</h2>
                 <p className="mb-8 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">
-                    Show Long-term Internship and Part-time Job
+                    Show Permanent employment, Long-term Internship and Part-time Job.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                     <div className="w-full px-0 pb-4">
@@ -224,12 +224,12 @@ const Page = () => {
                     </div>
                 </div>
                 <p className="pt-8 text-2xl font-bold text-center sm:text-left">
-                    See more on my <a href="https://isogai.notion.site/ec8f390467934e29a7dc7da0c28180fd" target="_blank" rel="noreferrer"
+                    See more on my <a href="https://github.com/isso-719" target="_blank" rel="noreferrer"
                                       className="text-2xl font-bold text-pink-500 hover:text-pink-600 dark:hover:text-pink-400">
-                    Notion
-                </a> and <a href="https://github.com/isso-719" target="_blank" rel="noreferrer"
-                            className="text-2xl font-bold text-pink-500 hover:text-pink-600 dark:hover:text-pink-400">
                     GitHub
+                </a> and <a href="https://isogai.notion.site/ec8f390467934e29a7dc7da0c28180fd" target="_blank" rel="noreferrer"
+                                           className="text-2xl font-bold text-pink-500 hover:text-pink-600 dark:hover:text-pink-400">
+                    Notion
                 </a>.
                 </p>
             </div>
