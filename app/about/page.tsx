@@ -52,7 +52,7 @@ const Page = () => {
                     <div className="py-8 sm:py-0 sm:pl-10 w-full sm:w-2/3">
                         <h2 className="pb-8 text-4xl font-bold text-center sm:text-left">About Me</h2>
                         <p className="text-base font-normal text-gray-600 dark:text-gray-300">
-                            こんにちは。磯貝和希です。よく周囲からは「いっそ」と呼ばれます。<br/><br/>
+                            こんにちは。磯貝和希です。よく周囲からは「いっそ」と呼ばれています。<br/><br/>
                             2 歳からゲームを機にコンピューターを触り始めました。<br/>
                             その後、Minecraft のサーバー構築をきっかけにプログラミングに興味を持ち、現在は Web アプリケーションを中心に開発を行っています。<br/>
                             また、日本を代表する EdTech で 3 年間、中高生中心に Web やゲームの開発、UI/UX を教える活動をし、
@@ -108,7 +108,7 @@ const Page = () => {
             </div>
             <div id="jobs" className="pb-36">
                 <h2 className="pb-2 text-4xl font-bold text-center sm:text-left">Job Experience</h2>
-                <p className="mb-8 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">
+                <p className="mb-8 text-sm font-normal leading-none text-gray-400 dark:text-gray-500 text-center sm:text-left">
                     Show Permanent employment, Long-term Internship and Part-time Job.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
@@ -169,7 +169,7 @@ const Page = () => {
             </div>
             <div id="works" className="pb-36">
                 <h2 className="pb-2 text-4xl font-bold text-center sm:text-left">Work</h2>
-                <p className="mb-8 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">
+                <p className="mb-8 text-sm font-normal leading-none text-gray-400 dark:text-gray-500 text-center sm:text-left">
                     Show a small selection of my work.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
@@ -236,13 +236,13 @@ const Page = () => {
                     GitHub
                 </a> and <a href="https://isogai.notion.site/ec8f390467934e29a7dc7da0c28180fd" target="_blank" rel="noreferrer"
                                            className="text-2xl font-bold text-pink-500 hover:text-pink-600 dark:hover:text-pink-400">
-                    Notion
+                    Explanation Notion
                 </a>.
                 </p>
             </div>
             <div id="skill" className="pb-36">
                 <h2 className="pb-2 text-4xl font-bold text-center sm:text-left">Skill</h2>
-                <p className="mb-8 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">
+                <p className="mb-8 text-sm font-normal leading-none text-gray-400 dark:text-gray-500 text-center sm:text-left">
                     Show a small selection of my skills.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
