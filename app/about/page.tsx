@@ -285,7 +285,7 @@ const Page = () => {
                             </defs>
                         </svg>
                         <p className="pt-8 text-center text-lg font-semibold text-gray-900 dark:text-white">
-                            Frontend, Backend, Desktop Apps
+                            Frontend, Backend, Desktop Apps, VSCode Extensions
                         </p>
                     </div>
                     <div
