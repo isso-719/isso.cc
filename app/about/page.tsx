@@ -363,6 +363,9 @@ const Page = () => {
                         <b>優秀賞: SPAJAM 2021 第四回 予選 (2021)</b>
                     </li>
                     <li className="m-0.5 text-center sm:text-left">
+                        優秀賞: 株式会社ライフイズテック 「MOVE ON HACKATHON」(2021)
+                    </li>
+                    <li className="m-0.5 text-center sm:text-left">
                         優秀賞: SFC未来構想キャンプ 映像づくりワークショップ (2019)
                     </li>
                     <li className="m-0.5 text-center sm:text-left">
