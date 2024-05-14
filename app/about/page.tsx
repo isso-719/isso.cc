@@ -53,7 +53,7 @@ const Page = () => {
                         <h2 className="pb-8 text-4xl font-bold text-center sm:text-left">About Me</h2>
                         <p className="text-base font-normal text-gray-600 dark:text-gray-300">
                             こんにちは。磯貝和希です。よく周囲からは「いっそ」と呼ばれています。<br/><br/>
-                            2 歳からゲームを機にコンピューターを触り始めました。<br/>
+                            2 歳からゲーム (Yahoo! きっず, クターが中心) を機にコンピューターを触り始めました。<br/>
                             その後、Minecraft のサーバー構築をきっかけにプログラミングに興味を持ち、現在は Web アプリケーションを中心に開発を行っています。<br/>
                             また、日本を代表する EdTech で 3 年間、中高生中心に Web やゲームの開発、UI/UX を教える活動をし、
                             それ以外でも様々な IT 企業でインターンシップを経験しています。<br/>
