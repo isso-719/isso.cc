@@ -392,7 +392,7 @@ const Page = () => {
                 <h2 className="pb-8 text-4xl font-bold text-center sm:text-left">Qualification</h2>
                 <ul className="list-none">
                     <li className="m-0.5 text-center sm:text-left">
-                        情報処理安全確保支援士試験 合格 (July 2024)
+                        情報処理安全確保支援士試験 合格 (July 2024, Unregistered)
                     </li>
                     <li className="m-0.5 text-center sm:text-left">
                         応用情報技術者試験 合格 (December 2022)
