@@ -118,7 +118,8 @@ const Page = () => {
                             April 2024 - Present
                         </p>
                         <p className="text-center sm:text-left mb-4 text-base font-normal text-gray-500 dark:text-gray-400">
-                            新卒入社した。
+                            新卒としてDMM.comに2024年4月入社。<br/>
+                            新卒研修後、動画配信開発部 プロダクトグループ リニューアルチームに配属予定。
                         </p>
                     </div>
                     <div className="w-full px-0 pb-4">
@@ -382,6 +383,11 @@ const Page = () => {
             <div id="publication" className="pb-36">
                 <h2 className="pb-8 text-4xl font-bold text-center sm:text-left">Publication</h2>
                 <ul className="list-none">
+                    <li className="m-0.5 text-center sm:text-left">
+                        磯貝 和希<br/>
+                        LT session: 「DIVE INTO Slices Sort」.<br/>
+                        DMM.go #8 - 24新卒エンジニアが語るGo,2024.
+                    </li>
                     <li className="m-0.5 text-center sm:text-left">
                         磯貝和希 (法政大学)，藤田悟 (法政大学). <br/>複数画面インタラクティブデジタルサイネージシステムの構築.<br/>情報処理学会
                         第86回全国大会 講演論文集，5Y-08，2024.
