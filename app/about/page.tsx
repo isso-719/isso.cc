@@ -384,10 +384,17 @@ const Page = () => {
                 <h2 className="pb-8 text-4xl font-bold text-center sm:text-left">Publication</h2>
                 <ul className="list-none">
                     <li className="m-0.5 text-center sm:text-left">
+                        めんだこ<br/>
+                        同人誌「24年度新卒 エンジニア クックブック」<br/>
+                        技術書典17, 2024.
+                    </li>
+                    <br/>
+                    <li className="m-0.5 text-center sm:text-left">
                         磯貝 和希<br/>
                         LT session: 「DIVE INTO Slices Sort」.<br/>
                         DMM.go #8 - 24新卒エンジニアが語るGo,2024.
                     </li>
+                    <br/>
                     <li className="m-0.5 text-center sm:text-left">
                         磯貝和希 (法政大学)，藤田悟 (法政大学). <br/>複数画面インタラクティブデジタルサイネージシステムの構築.<br/>情報処理学会
                         第86回全国大会 講演論文集，5Y-08，2024.
@@ -397,7 +404,7 @@ const Page = () => {
             <div id="qualification" className="pb-36">
                 <h2 className="pb-8 text-4xl font-bold text-center sm:text-left">Qualification</h2>
                 <ul className="list-none">
-                    <li className="m-0.5 text-center sm:text-left">
+                <li className="m-0.5 text-center sm:text-left">
                         Google Cloud Professional Cloud Developer (December 2024)
                     </li>
                     <li className="m-0.5 text-center sm:text-left">
